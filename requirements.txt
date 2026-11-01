@@ -1,0 +1,11 @@
+# ground truth, rendering and analysis (Python 3.10)
+numpy==1.26.4
+scipy==1.15.3
+Pillow==9.5.0
+statsmodels==0.15.0
+pyarrow            # tools/pancap_viewer/prepare_data.py (parquet masks)
+huggingface_hub    # tools/pancap_viewer/download_train_images.py
+tqdm
+
+# model runs (separate venv): vllm==0.11.0, transformers==4.57.1, torch
+# SAM 3 Agent baseline (separate venv): sam3 (facebookresearch, pip install -e), pycocotools

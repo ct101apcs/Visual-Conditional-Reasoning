@@ -1,0 +1,32 @@
+# --- heavy data: rebuilt from COCONut-PanCap / COCO (see data/README.md) ---
+/data/*
+!/data/README.md
+# ground truth of the testbed (small; everything the analysis reads besides model outputs)
+!/data/anchor_gt/
+/data/anchor_gt/*
+!/data/anchor_gt/summary.json
+!/data/anchor_gt/test_draft.jsonl
+!/data/anchor_gt/test_diag.jsonl
+!/data/anchor_gt/lite.json
+!/data/anchor_gt/regex_audit_haiku.json
+!/data/anchor_gt/visual_audit_sonnet.json
+# result tables (model outputs ship as a release asset: tools/eval/pack_outputs.sh)
+!/data/eval/
+/data/eval/*
+!/data/eval/results/
+
+# --- literature PDFs (1.3 GB): restore with lit-review/build_index.py --fetch ---
+/lit-review/papers/*
+!/lit-review/papers/MANIFEST.tsv
+
+# --- local / private ---
+/initial_memo.md
+/CsMag.zip
+/dist/
+/archive/
+design_proposals.md
+
+# --- python ---
+__pycache__/
+*.pyc
+.ipynb_checkpoints/

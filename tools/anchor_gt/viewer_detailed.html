@@ -1,0 +1,763 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ANCHOR GT viewer</title>
+<style>
+:root {
+  --bg: #f6f6f4; --panel: #ffffff; --line: #e2e2dc; --text: #1d1d1b; --muted: #6b6b66;
+  --accent: #2f6fde; --err: #c8372d; --warn: #b7791f; --ok: #2f8a4c; --chip: #f0f0ec; --sel: #e8effc;
+  --gS: #1f9d55; --gU: #d98a0b; --gN: #8a8a85; --subj: #d61fd6; --bar2: #7a5cc7; --ch: #e0453a;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #151514; --panel: #1e1e1c; --line: #33332f; --text: #e8e8e3; --muted: #9a9a93;
+          --accent: #6b9bf0; --err: #ef6a5f; --warn: #e2a64a; --ok: #5cbf7a; --chip: #2a2a27; --sel: #23324d;
+          --gS: #3ec878; --gU: #f0a932; --gN: #8d8d88; --subj: #f05df0; --bar2: #a590e6; --ch: #ff6a5e; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { background: var(--bg); color: var(--text); font: 13px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+code, .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+#top { display: flex; align-items: center; gap: 4px; padding: 0 14px; height: 42px; border-bottom: 1px solid var(--line); background: var(--panel); flex: none; }
+#top h1 { font-size: 14px; margin: 0 18px 0 0; letter-spacing: .02em; }
+.tabbtn { border: 0; border-bottom: 2px solid transparent; border-radius: 0; background: none; padding: 11px 12px; font-weight: 600; color: var(--muted); }
+.tabbtn.on { color: var(--text); border-bottom-color: var(--accent); }
+#topmsg { margin-left: auto; color: var(--muted); font-size: 12px; }
+.tab { display: none; flex: 1; min-height: 0; }
+.tab.on { display: block; }
+.scroll { overflow-y: auto; height: 100%; }
+.wrap { max-width: 1280px; margin: 0 auto; padding: 18px 22px 60px; }
+h2 { font-size: 16px; margin: 26px 0 8px; }
+h3 { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 14px 0 6px; font-weight: 600; }
+button, select, input[type=text] { font: inherit; color: var(--text); }
+button { padding: 3px 9px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); cursor: pointer; }
+button:hover:not(:disabled) { border-color: var(--accent); }
+button:disabled { opacity: .45; cursor: default; }
+select, input[type=text] { width: 100%; padding: 4px 6px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); }
+.muted { color: var(--muted); } .small { font-size: 11.5px; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; margin-bottom: 12px; }
+.grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); }
+.badge { display: inline-block; padding: 0 7px; border-radius: 10px; font-size: 11px; background: var(--chip); border: 1px solid var(--line); white-space: nowrap; }
+.badge.L1 { color: #2f6fde; } .badge.L2 { color: #8a5cc7; } .badge.L3 { color: #c2410c; }
+.badge.warn { color: var(--warn); border-color: var(--warn); } .badge.ok { color: var(--ok); border-color: var(--ok); } .badge.err { color: var(--err); border-color: var(--err); }
+table { border-collapse: collapse; font-size: 12px; }
+td, th { padding: 3px 7px; text-align: left; border-bottom: 1px solid var(--line); }
+th { color: var(--muted); font-weight: 500; }
+.num { text-align: right; font-variant-numeric: tabular-nums; }
+kbd { font-family: ui-monospace, monospace; font-size: 11px; border: 1px solid var(--line); border-radius: 4px; padding: 0 4px; }
+.subj { background: color-mix(in srgb, var(--subj) 22%, transparent); color: var(--subj); border-radius: 4px; padding: 0 4px; font-weight: 600; white-space: nowrap; }
+/* funnel */
+.frow { display: grid; grid-template-columns: 120px minmax(160px, 1fr) 70px 64px 64px 78px minmax(180px, 1.2fr); gap: 10px; align-items: center; padding: 4px 0; border-bottom: 1px solid var(--line); }
+.frow.head { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .05em; }
+.fbar { background: var(--chip); border-radius: 4px; height: 16px; position: relative; overflow: hidden; }
+.fbar > i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--accent); border-radius: 4px; }
+.fbar.b2 > i { background: var(--bar2); }
+.rej { color: var(--err); }
+.dist .drow { display: grid; grid-template-columns: 130px 1fr 92px; gap: 8px; align-items: center; padding: 1px 0; font-size: 12px; }
+.dist .dbar { background: var(--chip); height: 10px; border-radius: 3px; position: relative; }
+.dist .dbar > i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 3px; background: var(--accent); opacity: .8; }
+.dist .dn { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* rules */
+.para { margin: 3px 0; padding-left: 10px; border-left: 3px solid var(--line); }
+.hist { display: flex; gap: 3px; align-items: flex-end; height: 38px; }
+.hist div { width: 20px; text-align: center; font-size: 10px; color: var(--muted); display: flex; flex-direction: column; justify-content: flex-end; height: 100%; }
+.hist i { display: block; background: var(--accent); border-radius: 2px 2px 0 0; opacity: .85; }
+.hist.dr i { background: var(--bar2); }
+/* browse */
+.browse { display: grid; grid-template-columns: 270px minmax(0, 1fr) 480px; height: 100%; }
+.browse > * { min-height: 0; overflow: hidden; display: flex; flex-direction: column; }
+#bl { border-right: 1px solid var(--line); background: var(--panel); }
+#br { border-left: 1px solid var(--line); background: var(--panel); }
+#filters { padding: 8px 10px 4px; overflow-y: auto; max-height: 48%; flex: none; }
+#filters label.f { display: block; font-size: 10.5px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin: 5px 0 1px; }
+#filters .two { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+#filters .chk { display: flex; gap: 12px; margin: 6px 0; }
+#flist { flex: 1; overflow-y: auto; border-top: 1px solid var(--line); }
+.item { padding: 3px 10px; cursor: pointer; display: flex; gap: 7px; align-items: center; font-family: ui-monospace, monospace; font-size: 12px; }
+.item:hover { background: var(--chip); } .item.sel { background: var(--sel); }
+.item .meta { margin-left: auto; color: var(--muted); font-size: 10.5px; }
+.dot { width: 8px; height: 8px; border-radius: 50%; flex: none; background: var(--line); }
+.dot.rule_kept { background: var(--ok); } .dot.verify_error, .dot.missing { background: var(--err); } .dot.no_thing { background: var(--muted); }
+.dot.thing, .dot.size, .dot.phrase_unique, .dot.not_group, .dot.not_mismatch, .dot.clutter { background: var(--warn); }
+#pager { display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; }
+#toolbar { display: flex; gap: 14px; align-items: center; padding: 6px 12px; border-bottom: 1px solid var(--line); background: var(--panel); flex-wrap: wrap; flex: none; font-size: 12px; }
+#toolbar label { display: flex; gap: 4px; align-items: center; color: var(--muted); }
+.lg { display: inline-flex; align-items: center; gap: 4px; }
+.lg i { width: 14px; height: 10px; border-radius: 2px; display: inline-block; border: 2px solid; }
+#bc .body { flex: 1; overflow: auto; padding: 12px 14px 40px; }
+#stagebox { display: flex; justify-content: center; }
+#canvasWrap { position: relative; line-height: 0; box-shadow: 0 1px 6px rgba(0,0,0,.2); }
+#tip { position: fixed; pointer-events: none; background: rgba(20,20,20,.92); color: #fff; padding: 4px 8px; border-radius: 5px; font-size: 12px; display: none; z-index: 9; white-space: nowrap; }
+#br .body { flex: 1; overflow-y: auto; padding: 10px 14px 40px; }
+.acard { border: 1px solid var(--line); border-radius: 8px; padding: 6px 9px; margin-bottom: 5px; cursor: pointer; }
+.acard:hover { border-color: var(--accent); } .acard.on { border-color: var(--subj); background: color-mix(in srgb, var(--subj) 8%, transparent); }
+.acard.dim { opacity: .6; }
+.rgrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px; }
+.rbtn { text-align: left; padding: 3px 7px; display: flex; gap: 6px; align-items: baseline; white-space: nowrap; overflow: hidden; }
+.rbtn.on { border-color: var(--accent); background: var(--sel); }
+.rbtn.drop { opacity: .5; } .rbtn.drop .rn { text-decoration: line-through; }
+.rbtn .rn { overflow: hidden; text-overflow: ellipsis; flex: 1; font-size: 11px; color: var(--muted); }
+.rbtn .rc { font-size: 10.5px; font-family: ui-monospace, monospace; }
+.chip { display: inline-block; font-family: ui-monospace, monospace; font-size: 11.5px; padding: 0 6px; margin: 1px 2px 1px 0; border-radius: 9px; border: 1.5px solid var(--line); cursor: default; }
+.chip.S { border-color: var(--gS); background: color-mix(in srgb, var(--gS) 16%, transparent); }
+.chip.U { border-color: var(--gU); background: color-mix(in srgb, var(--gU) 16%, transparent); border-style: dashed; }
+.chip.O { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, transparent); }
+.chip.C { border-color: var(--ch); } .chip.hl { outline: 2px solid var(--text); }
+pre.q { white-space: pre-wrap; background: var(--chip); border-radius: 8px; padding: 8px 10px; font-size: 12px; margin: 4px 0 8px; font-family: ui-monospace, monospace; }
+.seg { display: flex; gap: 4px; }
+.seg button.on { background: var(--accent); color: #fff; border-color: var(--accent); }
+#ptable td, #ptable th { text-align: center; padding: 2px 6px; }
+#ptable td.l, #ptable th.l { text-align: left; }
+#ptable tr.row:hover, #ptable tr.row.hl { background: var(--sel); }
+#ptable .used { background: color-mix(in srgb, var(--accent) 10%, transparent); }
+#ptable th.used { color: var(--accent); font-weight: 700; }
+#ptable .t { color: var(--ok); font-weight: 700; } #ptable .f { color: var(--muted); } #ptable .u { color: var(--gU); font-weight: 700; }
+#ptable small { display: block; color: var(--muted); font-size: 10px; line-height: 1.1; }
+#ptable tr.opp td.cellc { background: color-mix(in srgb, var(--accent) 22%, transparent); font-weight: 700; color: var(--accent); }
+#ptable td.cellc { font-family: ui-monospace, monospace; letter-spacing: .08em; }
+.qm { border-collapse: collapse; } .qm td, .qm th { text-align: center; padding: 2px 8px; } .qm td.on { color: var(--ok); font-weight: 700; }
+.kv { display: grid; grid-template-columns: 190px 1fr; gap: 3px 12px; font-size: 12.5px; } .kv > div:nth-child(odd) { color: var(--muted); }
+#ptable tr.gS td.gt { color: var(--gS); font-weight: 700; } #ptable tr.gU td.gt { color: var(--gU); font-weight: 700; }
+#caption { line-height: 1.8; font-size: 13.5px; white-space: pre-wrap; }
+.tag { border-bottom: 2px solid var(--line); padding: 0 2px; cursor: default; }
+.tag sup { font-family: ui-monospace, monospace; font-size: 9.5px; color: var(--muted); margin-right: 2px; }
+.tag.cand { border-bottom-color: var(--accent); }
+.tag.subj-t { background: color-mix(in srgb, var(--subj) 25%, transparent); border-bottom-color: var(--subj); font-weight: 600; }
+.tag.hl { outline: 2px solid var(--text); }
+details summary { cursor: pointer; color: var(--muted); }
+</style>
+</head>
+<body>
+<div id="top">
+  <h1>ANCHOR ground truth</h1>
+  <button class="tabbtn" data-tab="funnel">Funnel &amp; dataset</button>
+  <button class="tabbtn" data-tab="rules">Rules</button>
+  <button class="tabbtn" data-tab="browse">Browse</button>
+  <span id="topmsg"></span>
+</div>
+
+<div class="tab" id="tab-funnel"><div class="scroll"><div class="wrap" id="funnelBody">loading…</div></div></div>
+<div class="tab" id="tab-rules"><div class="scroll"><div class="wrap" id="rulesBody">loading…</div></div></div>
+
+<div class="tab" id="tab-browse">
+  <div class="browse">
+    <aside id="bl">
+      <div id="filters">
+        <label class="f">split</label><select id="f_split"></select>
+        <label class="f">stage (furthest funnel stage reached by any subject)</label><select id="f_stage"></select>
+        <div class="two"><div><label class="f">scene io (caption)</label><select id="f_io"></select></div>
+          <div><label class="f">scene io (mask)</label><select id="f_io_stuff"></select></div></div>
+        <label class="f">setting</label><select id="f_setting"></select>
+        <div class="two"><div><label class="f">food</label><select id="f_food"><option value="">any</option><option value="1">yes</option><option value="0">no</option></select></div>
+          <div><label class="f">people (mask)</label><select id="f_people"><option value="">any</option><option value="1">yes</option><option value="0">no</option></select></div></div>
+        <div class="two"><div><label class="f">subject type</label><select id="f_type"></select></div>
+          <div><label class="f">rule kept</label><select id="f_tid"></select></div></div>
+        <label class="f">subject category</label><select id="f_cat"></select>
+        <div class="chk"><label><input type="checkbox" id="f_text_ok"> text_ok only</label><label><input type="checkbox" id="f_draft"> in draft only</label></div>
+        <input type="text" id="f_q" placeholder="key contains…">
+      </div>
+      <div id="flist"></div>
+      <div id="pager"><button id="prevPage">‹</button><span id="pageInfo"></span><button id="nextPage">›</button></div>
+    </aside>
+
+    <section id="bc">
+      <div id="toolbar">
+        <b class="mono" id="title">—</b>
+        <span class="lg"><i style="border-color:var(--subj);border-width:3px"></i>subject</span>
+        <span class="lg"><i style="border-color:var(--gS);background:color-mix(in srgb,var(--gS) 30%,transparent)"></i>S*</span>
+        <span class="lg"><i style="border-color:var(--gU);border-style:dashed"></i>U (ignore)</span>
+        <span class="lg"><i style="border-color:var(--gN)"></i>not selected</span>
+        <span class="lg"><b style="color:var(--ch)">◆</b>counter-heuristic</span>
+        <span class="lg"><b style="color:var(--accent)">▲</b>opportunity cell</span>
+        <label><input type="checkbox" id="showAll"> all segments</label>
+        <label><input type="checkbox" id="showMarks" checked> marks</label>
+        <span class="muted"><kbd>←</kbd><kbd>→</kbd> prev/next image</span>
+        <span id="imgmsg" class="muted"></span>
+      </div>
+      <div class="body">
+        <div id="stagebox"><div id="canvasWrap"><canvas id="cv"></canvas></div></div>
+        <h3>Predicates <span class="muted" id="ptitle"></span></h3>
+        <div style="overflow-x:auto"><table id="ptable"></table></div>
+      </div>
+    </section>
+
+    <aside id="br"><div class="body" id="detail"><span class="muted">Pick an image.</span></div></aside>
+  </div>
+</div>
+<div id="tip"></div>
+
+<script>
+"use strict";
+const $ = s => document.querySelector(s);
+const esc = t => String(t ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const pct = (a, b, d = 1) => b ? (100 * a / b).toFixed(d) + '%' : '–';
+const fmt = n => n == null ? '–' : Number(n).toLocaleString('en-US');
+const jget = async url => { const r = await fetch(url); if (!r.ok) throw new Error(url + ' -> ' + r.status); return r.json(); };
+const STAGE_IDS = ['thing', 'size', 'phrase_unique', 'not_group', 'not_mismatch', 'clutter', 'rule_kept'];
+const THRESH_DOC = {
+  SUBJ_MIN: 'min subject area (fraction of image)', SUBJ_MAX: 'max subject area (fraction of image)',
+  CAND_MIN: 'things below this area fraction are not marked / not candidates', MIN_CANDS: 'min marked candidates per subject',
+  MAX_CANDS: 'max marked candidates per subject', SIZE_MARGIN: 'larger/smaller: ratio > m / < 1/m, else ignore band U',
+  TOUCH_PX: 'touch: gap <= this (px) is True', FAR_FRAC: 'touch: gap > this x image diagonal is False, between is U',
+  POS_MARGIN: 'left/above: +-this x W (or H) around the subject edge is U', BORDER_PX: 'border: edge distance <= this (px) is True',
+  BORDER_FRAC: 'border: edge distance > this x diagonal is False, between is U', U_DROP: 'drop a rule instance if more than this share of its candidates is in U',
+};
+const S = { sum: null, splits: [], tab: 'funnel', split: null, f: {}, filters: null, list: { items: [], total: 0, offset: 0, limit: 100 },
+            key: null, rec: null, cap: null, draft: [], ids: null, w: 0, h: 0, img: null, aid: null, tid: null, mod: 'contour', para: 0,
+            hoverId: null, renderTok: 0, scale: 1 };
+const COMPS = ['touch', 'size', 'left', 'above', 'same_cat', 'border', 'AND', 'NOT', 'EXCEPT', 'CLOSURE'];
+const tmpl = tid => S.sum && S.sum.templates.find(x => x.id === tid);
+const hasOpp = t => !!t && (t.has_opp ?? ((t.neg || []).length > 0 || (t.exc || []).length > 0 || !!t.closure));
+/* opportunity cell: where the NOT / EXCEPT / closure clause decides (all prims T; T15: touch T, same_cat F, border T; T16: 2nd letter T) */
+function isOppCell(t, c) {
+  if (!t || !c || !hasOpp(t)) return false;
+  if (t.closure) return c[1] === 'T';
+  if (t.id === 'T15') return c === 'TFT';
+  return /^T+$/.test(c);
+}
+function cellsOf(a, r) {
+  if (!r || !r.cells) return null;
+  const cs = r.cells.split(' '), m = {};
+  a.cands.forEach((id, i) => { m[id] = cs[i]; });
+  return m;
+}
+const curAnchor = () => S.rec && S.rec.anchors.find(a => a.id === S.aid);
+
+/* ------------------------------------------------------------------ hash / tabs */
+function setHash() {
+  const p = new URLSearchParams();
+  p.set('tab', S.tab);
+  if (S.split) p.set('split', S.split);
+  if (S.key) { p.set('key', S.key); if (S.aid != null) p.set('a', S.aid); if (S.tid) p.set('r', S.tid); }
+  history.replaceState(null, '', '#' + p.toString());
+}
+function showTab(t) {
+  S.tab = t;
+  document.querySelectorAll('.tab').forEach(e => e.classList.toggle('on', e.id === 'tab-' + t));
+  document.querySelectorAll('.tabbtn').forEach(e => e.classList.toggle('on', e.dataset.tab === t));
+  setHash();
+  if (t === 'browse' && S.rec) draw();
+}
+document.querySelectorAll('.tabbtn').forEach(b => b.onclick = () => showTab(b.dataset.tab));
+
+/* ------------------------------------------------------------------ funnel tab */
+function funnelBars(rows, cls) {
+  const total = rows[0].count;
+  return `<div class="frow head"><div>stage</div><div></div><div class="num">count</div><div class="num">% prev</div><div class="num">% all</div><div class="num">rejected</div><div>description</div></div>` +
+    rows.map((r, i) => `<div class="frow"><div class="mono">${esc(r.id)}</div>
+      <div class="fbar ${cls}"><i style="width:${total ? 100 * r.count / total : 0}%"></i></div>
+      <div class="num">${fmt(r.count)}</div><div class="num">${i ? pct(r.count, rows[i - 1].count) : '–'}</div>
+      <div class="num">${pct(r.count, total)}</div><div class="num rej">${r.rej ? '−' + fmt(r.rej) : ''}</div>
+      <div class="small muted">${esc(r.desc)}</div></div>`).join('');
+}
+function dist(title, obj, o = {}) {
+  let ents = Object.entries(obj || {});
+  if (o.keys) ents = o.keys.map(k => [String(k), obj?.[k] ?? 0]);
+  else ents.sort((a, b) => b[1] - a[1]);
+  const total = ents.reduce((s, e) => s + e[1], 0), max = Math.max(1, ...ents.map(e => e[1]));
+  const shown = o.limit ? ents.slice(0, o.limit) : ents;
+  return `<div class="card dist"><h3 style="margin-top:0">${esc(title)} <span class="muted" style="text-transform:none;letter-spacing:0">(n=${fmt(total)})</span></h3>` +
+    (o.note ? `<div class="small muted" style="margin-bottom:4px">${esc(o.note)}</div>` : '') +
+    shown.map(([k, v]) => `<div class="drow"><div class="dn" title="${esc(k)}">${esc(k)}</div><div class="dbar"><i style="width:${100 * v / max}%"></i></div><div class="num">${fmt(v)} · ${pct(v, total)}</div></div>`).join('') +
+    (shown.length < ents.length ? `<div class="small muted">… ${ents.length - shown.length} more</div>` : '') + `</div>`;
+}
+function renderFunnel() {
+  const sum = S.sum;
+  if (!sum) { $('#funnelBody').innerHTML = '<p>summary.json not found. Run <code>generate.py --sample</code>.</p>'; return; }
+  const desc = Object.fromEntries(sum.stages.map(s => [s.id, s.desc]));
+  let h = `<div class="small muted">summary generated ${esc(sum.generated)} · splits on disk: ${S.splits.map(s => `${s} (${fmt(S.sizes[s])} images)`).join(', ') || 'none'}</div>`;
+  for (const sp of ['val', 'train']) {
+    const f = sum.funnel[sp];
+    h += `<h2>${sp}</h2>`;
+    if (!f) { h += `<div class="card muted">No data for <b>${sp}</b> yet. Generate it with generate.py, re-run <code>--sample</code>, then restart this server.</div>`; continue; }
+    const I = f.images, A = f.anchors, rej = f.rejected_at || {};
+    const irows = [{ id: 'all', count: I.all, desc: 'images in the split' },
+      { id: 'verify_ok', count: I.verify_ok, rej: I.all - I.verify_ok, desc: 'verify status is not "error" and caption + mask exist (lost to verify errors / missing files)' }];
+    for (const s of STAGE_IDS) irows.push({ id: s, count: I[s], desc: 'images with ≥1 subject reaching: ' + desc[s] });
+    for (let i = 2; i < irows.length; i++) irows[i].rej = irows[i - 1].count - irows[i].count;
+    const arows = [{ id: 'all things', count: A.thing + (rej.thing || 0), desc: 'every thing segment of the verified images (incl. crowd / empty)' }];
+    for (const s of STAGE_IDS) arows.push({ id: s, count: A[s], desc: desc[s] });
+    for (let i = 1; i < arows.length; i++) { const id = STAGE_IDS[i - 1]; arows[i].rej = rej[id] ?? (arows[i - 1].count - arows[i].count); }
+    h += `<div class="card"><h3 style="margin-top:0">Image funnel</h3>${funnelBars(irows, '')}</div>`;
+    h += `<div class="card"><h3 style="margin-top:0">Anchor (subject) funnel</h3>${funnelBars(arows, 'b2')}
+      <div class="small muted" style="margin-top:6px">"rejected" for subjects = rejected_at[stage]: subjects that failed to pass that stage. Generation took ${f.seconds ?? '?'} s.</div></div>`;
+    const sc = sum.scene[sp];
+    if (sc) {
+      const ok = sc.text_ok || {}, tt = (ok.True || 0) + (ok.False || 0);
+      h += `<h3>Scene &amp; subject breakdown — surviving images (rule_kept: ${fmt(I.rule_kept)}) and subjects with ≥1 kept rule (${fmt(A.rule_kept)})</h3><div class="grid">`;
+      h += dist('Indoor/outdoor from caption regex (images)', sc.io);
+      h += dist('Indoor/outdoor from mask stuff classes (images)', sc.io_stuff);
+      h += dist('Agreement caption vs mask io (images)', sc.io_agree, { note: 'unknown on either side counts as undecided' });
+      h += dist('Food in image (images)', sc.food);
+      h += dist('People in image, from mask (images)', sc.people_in_image);
+      h += dist('Settings (images, multi-label)', sc.settings);
+      h += dist('Subject type from COCO category (subjects)', sc.subject_type);
+      h += dist('Subject type: category vs caption phrase (subjects)', sc.subject_type_phrase_agree);
+      h += dist('text_ok (subjects)', sc.text_ok, { note: `text modality usable for ${pct(ok.True || 0, tt)} of subjects` });
+      h += dist('Clutter: number of candidates (subjects)', sc.clutter, { keys: Array.from({ length: 17 }, (_, i) => i + 4) });
+      h += dist('Subject category (subjects)', sc.subject_category, { limit: 25 });
+      h += `</div>`;
+    }
+  }
+  h += `<h2>Thresholds</h2><div class="card"><table><tr><th>name</th><th>value</th><th>meaning</th></tr>` +
+    Object.entries(sum.thresholds).map(([k, v]) => `<tr><td class="mono">${k}</td><td class="mono">${v}</td><td class="muted">${esc(THRESH_DOC[k] || '')}</td></tr>`).join('') + `</table></div>`;
+  h += `<h2>Modalities</h2><div class="card">${Object.entries(sum.modalities).map(([k, v]) => `<div><b class="mono">${k}</b> · ${esc(v)}</div>`).join('')}</div>`;
+  $('#funnelBody').innerHTML = h;
+}
+
+/* ------------------------------------------------------------------ rules tab */
+const subjHtml = t => esc(t).replace(/\{S\}/g, '<span class="subj">‹subject›</span>');
+const BINS = ['0', '1', '2', '3', '4', '5+'];
+function hist(counts, cls) {
+  const max = Math.max(1, ...BINS.map(b => counts?.[b] || 0));
+  return `<div class="hist ${cls || ''}">` + BINS.map(b => { const v = counts?.[b] || 0;
+    return `<div title="|S*|=${b}: ${v}"><i style="height:${Math.round(30 * v / max)}px"></i>${b}</div>`; }).join('') + `</div>`;
+}
+function renderRules() {
+  const sum = S.sum;
+  if (!sum) { $('#rulesBody').innerHTML = '<p>summary.json not found.</p>'; return; }
+  const twins = {}; for (const [a, b] of sum.extensional_twins) { twins[a] = b; twins[b] = a; }
+  const sps0 = Object.keys(sum.rule_stats);
+  const oppSplit = sps0.includes('train') && sum.rule_stats.train ? 'train' : sps0[0];
+  const oppPct = (t, sp) => { const r = sum.rule_stats[sp]?.[t.id]; return hasOpp(t) && r && r.opp != null ? pct(r.opp, r.kept) : '–'; };
+  const roleStr = d => ['target', 'twin', 'companion'].map(k => `${k} ${d['role_' + k] || 0}`).join(' · ');
+  const probeDoc = p => p === 'touches' ? 'the list of the other marked objects whose visible outline shares a border with this object\'s outline (used to compute the closure)'
+    : 'is true for an object that ' + sum.predicates[p].replace(/\{S\}/g, '‹subject›');
+  const dr = sum.draft;
+  let h = `<div class="small muted">Draft Test sample: <b>${fmt(dr.n)}</b> items · targets per template ${Object.entries(dr.targets || {}).map(([k, v]) => k + ': ' + v).join(', ')} · |S*| bin shares ${Object.entries(dr.bin_share || {}).map(([k, v]) => k + ': ' + v).join(', ')}.
+    |S*| bins: 0..4 and 5+. "Kept" = instances with ≤ ${(sum.thresholds.U_DROP * 100)}% of candidates in U. "Opportunity" = kept instances with ≥1 candidate in the cell where the NOT / EXCEPT / closure clause decides.</div>`;
+  // design checks
+  const tc = sum.template_checks;
+  if (tc) {
+    const tm = sum.twin_mismatch || {};
+    const pairs = tc.twins.map(([a, b]) => { const n = tm[a + '/' + b] ?? 0; return `<span class="badge ${n ? 'err' : 'ok'}">${a}/${b} mismatches: ${n}</span>`; }).join(' ');
+    const usedComps = COMPS.filter(c => Object.values(tc.q_matrix).some(v => v.includes(c)));
+    h += `<div class="card"><h3 style="margin-top:0">Design checks</h3><div style="display:grid;grid-template-columns:minmax(0,1fr) auto;gap:26px;align-items:start"><div class="kv">
+      <div>NOT families</div><div>${tc.not_families.map(esc).join(', ')} <span class="muted">(${tc.not_families.length})</span></div>
+      <div>EXCEPT families</div><div>${tc.except_families.map(esc).join(', ')} <span class="muted">(${tc.except_families.length})</span></div>
+      <div>Q-matrix rank / columns</div><div><span class="badge ${tc.q_rank >= tc.q_cols ? 'ok' : 'err'}">${tc.q_rank} / ${tc.q_cols}</span></div>
+      <div>extensional twins</div><div>${tc.twins.map(p => p.join('/')).join(', ')} · ${pairs}</div>
+      <div>AND without NOT</div><div>${tc.and_without_not.length ? tc.and_without_not.map(x => `<span class="badge mono">${x}</span>`).join(' ') : '–'}</div>
+      <div>build-time fails</div><div>${tc.fails.length ? tc.fails.map(f => `<span class="badge err">${esc(f)}</span>`).join(' ') : '<span class="badge ok">none</span>'}</div></div>
+      <div style="overflow-x:auto"><table class="qm"><tr><th></th>${COMPS.map(c => `<th>${c}</th>`).join('')}</tr>` +
+      Object.entries(tc.q_matrix).map(([tid, cs]) => `<tr><td class="mono">${tid}</td>${COMPS.map(c => `<td class="${cs.includes(c) ? 'on' : ''}">${cs.includes(c) ? '✓' : ''}</td>`).join('')}</tr>`).join('') +
+      `</table></div></div></div>`;
+  }
+  // draft sample
+  const tpa = dr.templates_per_anchor || {};
+  h += `<div class="card"><h3 style="margin-top:0">Draft Test sample</h3><div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:26px"><div class="kv">
+    <div>items</div><div><b>${fmt(dr.n)}</b> <span class="muted">(each runs in text and contour)</span></div>
+    <div>anchors (groups)</div><div>${fmt(dr.anchors)}</div><div>images</div><div>${fmt(dr.images)}</div>
+    <div>max templates per anchor</div><div>${dr.max_per_anchor ?? '–'}</div><div>min opportunity share</div><div>${dr.min_opp ?? '–'} <span class="muted">(has-clause templates)</span></div>
+    <div>calls per model</div><div>direct ${fmt(dr.calls_per_model?.direct)} · probe ${fmt(dr.calls_per_model?.probe)}</div>
+    <div>probes needing <code>touches</code></div><div>${fmt(dr.probes_with_touches)} <span class="muted">(anchors with a CLOSURE item)</span></div></div>
+    ${dist('Templates per anchor', tpa, { keys: Object.keys(tpa).sort((x, y) => x - y), note: 'anchors by number of draft items' })}</div></div>`;
+  // overview: one row per template, kept instances per split + draft size
+  const sps = Object.keys(sum.rule_stats);
+  h += `<div class="card"><h3>Overview — ${sum.templates.length} rule templates</h3><table><tr><th>id</th><th>level</th><th>rule</th><th>wording</th><th>twin</th><th>probe</th>` +
+    sps.map(sp => `<th class="num">${sp} kept</th><th class="num">empty</th><th class="num">mean |S*|</th>`).join('') + `<th class="num" title="kept instances with ≥1 candidate in the opportunity cell (${oppSplit})">opp % (${oppSplit})</th><th class="num">draft</th><th class="num" title="share of draft items with fire > 0">draft opp %</th></tr>` +
+    sum.templates.map(t => {
+      const d = (dr.per_template || {})[t.id] || {};
+      return `<tr><td><a class="mono" href="#" data-jump="${t.id}">${t.id}</a></td><td><span class="badge ${t.level}">${t.level}</span></td><td>${esc(t.name)}${t.calibration ? ' <span class="badge warn">calibration</span>' : ''}</td><td class="small">${esc(t.wording || '–')}</td><td class="mono small">${twins[t.id] || '–'}</td><td class="mono small">${t.probe.join(', ')}</td>` +
+        sps.map(sp => { const r = sum.rule_stats[sp]?.[t.id]; return r ? `<td class="num">${fmt(r.kept)}</td><td class="num">${pct(r.empty || 0, r.kept)}</td><td class="num">${r.kept ? (r.sum_S / r.kept).toFixed(2) : '–'}</td>` : '<td class="num">–</td><td></td><td></td>'; }).join('') +
+        `<td class="num">${oppPct(t, oppSplit)}</td><td class="num">${fmt(d.all || 0)}</td><td class="num">${hasOpp(t) ? pct(d.opp || 0, d.all || 0) : '–'}</td></tr>`;
+    }).join('') + `</table></div>`;
+  for (const t of sum.templates) {
+    const tw = twins[t.id];
+    h += `<div class="card" id="rule-${t.id}"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <b class="mono" style="font-size:15px">${t.id}</b><span class="badge ${t.level}">${t.level}</span><b>${esc(t.name)}</b>
+      ${t.calibration ? '<span class="badge warn" title="Single predicate: used to calibrate perception, not as a reasoning rule">calibration template</span>' : ''}
+      ${tw ? `<span class="badge warn" title="Same program, different wording: the ground-truth sets are identical by construction">extensional twin of ${tw}</span>` : ''}
+      <span style="margin-left:auto"><button data-browse="${t.id}">browse kept instances →</button></span></div>
+      <div style="display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:18px;margin-top:6px">
+      <div class="small" style="grid-column:1/-1;display:flex;gap:22px;flex-wrap:wrap">
+        <span><span class="muted">prims (cell order)</span> <b class="mono">${(t.prims || t.probe).join(', ')}</b></span>
+        <span><span class="muted">NOT</span> <b class="mono">${(t.neg || []).join(', ') || '–'}</b></span>
+        <span><span class="muted">EXCEPT</span> <b class="mono">${(t.exc || []).join(', ') || '–'}</b></span>
+        <span><span class="muted">wording</span> <b>${esc(t.wording || '–')}</b></span>
+        <span><span class="muted">components</span> ${(t.components || []).map(c => `<span class="badge mono">${c}</span>`).join(' ') || '–'}</span></div>
+      <div><h3>Paraphrases</h3>${t.text.map((x, i) => `<div class="para"><span class="muted mono">${i}</span> ${subjHtml(x)}</div>`).join('')}</div>
+      <div><h3>Probe predicates</h3>${t.probe.map(p => `<div style="margin:3px 0"><b class="mono">${p}</b> <span class="muted small">${subjHtml(probeDoc(p))}</span></div>`).join('')}</div></div>
+      <h3>Statistics (surviving subjects)</h3>
+      <table><tr><th>split</th><th class="num">instances</th><th class="num">kept</th><th class="num">empty S*</th><th class="num">mean |S*|</th><th class="num">pairs in U</th><th class="num">with counter-heuristic</th><th>|S*| histogram (kept)</th><th class="num" title="kept instances with ≥1 candidate in the opportunity cell">opportunity</th><th>draft items</th></tr>`;
+    for (const sp of Object.keys(sum.rule_stats)) {
+      const r = sum.rule_stats[sp][t.id]; if (!r) continue;
+      const d = (dr.per_template || {})[t.id] || {};
+      h += `<tr><td class="mono">${sp}</td><td class="num">${fmt(r.instances)}</td><td class="num">${pct(r.kept, r.instances)}</td>
+        <td class="num" title="of kept">${pct(r.empty || 0, r.kept)}</td><td class="num">${r.kept ? (r.sum_S / r.kept).toFixed(2) : '–'}</td>
+        <td class="num" title="${fmt(r.pairs_U)} of ${fmt(r.pairs)} candidate pairs">${pct(r.pairs_U, r.pairs)}</td>
+        <td class="num" title="of kept">${pct(r.ch || 0, r.kept)}</td><td>${hist(sum.size_hist[sp]?.[t.id])}</td><td class="num" title="${hasOpp(t) ? fmt(r.opp || 0) + ' of ' + fmt(r.kept) + ' kept' : 'no NOT / EXCEPT / closure clause'}">${oppPct(t, sp)}</td><td class="num">${fmt(d['src_' + sp] || 0)}</td></tr>`;
+    }
+    const d = (dr.per_template || {})[t.id] || {};
+    const srcs = Object.keys(d).filter(k => k.startsWith('src_')).map(k => k.slice(4) + ' ' + d[k]).join(', ');
+    h += `</table><div style="display:flex;gap:26px;align-items:flex-end;margin-top:8px;flex-wrap:wrap">
+      <div><div class="small muted">draft sample per |S*| bin</div>${hist(d, 'dr')}</div>
+      <div class="small"><span class="muted">draft items</span> ${d.all || 0} (${roleStr(d)})<br><span class="muted">source split</span> ${srcs || '–'}<br><span class="muted">with counter-heuristic candidate</span> ${d.ch || 0}
+        (${pct(d.ch || 0, d.all || 0)})${hasOpp(t) ? `<br><span class="muted">with opportunity (fire &gt; 0)</span> ${d.opp || 0} (${pct(d.opp || 0, d.all || 0)})` : ''}</div></div></div>`;
+  }
+  $('#rulesBody').innerHTML = h;
+  document.querySelectorAll('[data-jump]').forEach(a => a.onclick = e => { e.preventDefault(); $('#rule-' + a.dataset.jump).scrollIntoView({ behavior: 'smooth' }); });
+  document.querySelectorAll('[data-browse]').forEach(b => b.onclick = () => {
+    S.f.tid = b.dataset.browse; syncFilterUI(); showTab('browse'); S.list.offset = 0; loadList();
+  });
+}
+
+/* ------------------------------------------------------------------ browse: filters & list */
+const FIELDS = { stage: 'f_stage', io: 'f_io', io_stuff: 'f_io_stuff', setting: 'f_setting', food: 'f_food', people: 'f_people', type: 'f_type', cat: 'f_cat', tid: 'f_tid' };
+function fillSelect(id, pairs, anyLabel = 'any') {
+  const el = $('#' + id), cur = el.value;
+  el.innerHTML = `<option value="">${anyLabel}</option>` + pairs.map(([v, n, label]) => `<option value="${esc(v)}">${esc(label || v)}${n != null ? ' (' + fmt(n) + ')' : ''}</option>`).join('');
+  el.value = [...el.options].some(o => o.value === cur) ? cur : '';
+}
+function syncFilterUI() {
+  for (const [k, id] of Object.entries(FIELDS)) if ($('#' + id)) $('#' + id).value = S.f[k] || (k === 'stage' ? 'survived' : '');
+  $('#f_text_ok').checked = !!S.f.text_ok; $('#f_draft').checked = !!S.f.draft; $('#f_q').value = S.f.q || '';
+}
+function readFilters() {
+  const f = {};
+  for (const [k, id] of Object.entries(FIELDS)) f[k] = $('#' + id).value;
+  f.text_ok = $('#f_text_ok').checked ? '1' : ''; f.draft = $('#f_draft').checked ? '1' : ''; f.q = $('#f_q').value.trim();
+  S.f = f;
+}
+async function loadFilters() {
+  const F = S.filters = await jget('/api/filters?split=' + S.split);
+  const stages = Object.fromEntries(F.stage);
+  const surv = stages.rule_kept || 0;
+  fillSelect('f_stage', [['survived', surv, 'survived (rule_kept)'], ['rejected', F.n - surv, 'rejected (any stage)'],
+    ...F.stage.filter(([s]) => s !== 'rule_kept').map(([s, n]) => [s, n, 'stopped after: ' + s])], 'all images');
+  $('#f_stage').options[0].value = 'all';
+  fillSelect('f_io', F.io); fillSelect('f_io_stuff', F.io_stuff); fillSelect('f_setting', F.setting);
+  fillSelect('f_type', F.type); fillSelect('f_cat', F.cat); fillSelect('f_tid', F.tid);
+  if (!$('#f_stage').value) $('#f_stage').value = 'survived';
+}
+async function loadList(keepFirst) {
+  readFilters();
+  const p = new URLSearchParams({ split: S.split, offset: S.list.offset, limit: S.list.limit });
+  for (const [k, v] of Object.entries(S.f)) if (v) p.set(k, v);
+  const r = await jget('/api/list?' + p);
+  S.list.items = r.items; S.list.total = r.total;
+  renderList();
+  if (keepFirst && r.items.length) openImage(r.items[0].key);
+}
+function renderList() {
+  const L = S.list;
+  $('#flist').innerHTML = L.items.map(it => `<div class="item${it.key === S.key ? ' sel' : ''}" data-key="${it.key}"><span class="dot ${it.stage}" title="${it.stage}"></span>${it.key}
+    <span class="meta">${it.n_anchors}a${it.n_text ? ' ' + it.n_text + 't' : ''}${it.in_draft ? ' ★' + it.in_draft : ''}</span></div>`).join('') || '<div class="pad muted" style="padding:10px">no matches</div>';
+  $('#pageInfo').textContent = L.total ? `${L.offset + 1}–${Math.min(L.offset + L.limit, L.total)} of ${fmt(L.total)}` : '0 matches';
+  $('#prevPage').disabled = L.offset <= 0; $('#nextPage').disabled = L.offset + L.limit >= L.total;
+}
+$('#flist').onclick = e => { const t = e.target.closest('.item'); if (t) openImage(t.dataset.key); };
+$('#prevPage').onclick = () => { S.list.offset = Math.max(0, S.list.offset - S.list.limit); loadList(); };
+$('#nextPage').onclick = () => { S.list.offset += S.list.limit; loadList(); };
+document.querySelectorAll('#filters select, #filters input[type=checkbox]').forEach(el => {
+  if (el.id === 'f_split') return;
+  el.onchange = () => { S.list.offset = 0; loadList(); };
+});
+let qTimer; $('#f_q').oninput = () => { clearTimeout(qTimer); qTimer = setTimeout(() => { S.list.offset = 0; loadList(); }, 250); };
+$('#f_split').onchange = async () => { S.split = $('#f_split').value; S.f = {}; S.list.offset = 0; S.key = null; await loadFilters(); syncFilterUI(); await loadList(true); };
+
+/* ------------------------------------------------------------------ browse: image detail */
+async function openImage(key, aid, tid) {
+  S.key = key; S.hoverId = null;
+  document.querySelectorAll('.item').forEach(e => e.classList.toggle('sel', e.dataset.key === key));
+  $('#title').textContent = `${S.split} / ${key}`;
+  $('#imgmsg').textContent = 'loading…';
+  let d, mk;
+  try {
+    [d, mk] = await Promise.all([jget(`/api/image?split=${S.split}&key=${key}`),
+      fetch(`/mask/${S.split}/${key}`).then(async r => r.ok ? { buf: await r.arrayBuffer(), w: +r.headers.get('X-Width'), h: +r.headers.get('X-Height') } : null)]);
+  } catch (e) { $('#imgmsg').textContent = String(e); return; }
+  if (S.key !== key) return;
+  S.rec = d.rec; S.cap = d; S.draft = d.draft;
+  if (mk) { S.ids = new Uint16Array(mk.buf); S.w = mk.w; S.h = mk.h; } else { S.ids = null; S.w = d.rec.W; S.h = d.rec.H; }
+  const anchors = d.rec.anchors, kept = a => Object.values(a.rules).some(r => r.keep);
+  const want = anchors.find(a => a.id === aid) || anchors.find(kept) || anchors[0];
+  S.aid = want ? want.id : null;
+  selectRuleDefault(tid);
+  S.img = null; draw(); renderDetail(); setHash();
+  $('#imgmsg').textContent = 'loading image…';
+  const img = new Image();
+  img.onload = () => { if (S.key === key) { S.img = img; $('#imgmsg').textContent = ''; draw(); } };
+  img.onerror = () => { if (S.key === key) $('#imgmsg').textContent = 'image unavailable – overlays only'; };
+  img.src = `/image/${S.split}/${key}`;
+}
+function selectRuleDefault(tid) {
+  const a = curAnchor();
+  if (!a) { S.tid = null; return; }
+  if (tid && a.rules[tid]) S.tid = tid;
+  else if (S.tid && a.rules[S.tid]) { /* keep */ }
+  else S.tid = (Object.entries(a.rules).find(([, r]) => r.keep) || Object.entries(a.rules)[0] || [null])[0];
+  applyDraftChoice();
+}
+function draftItem() { const a = curAnchor(); return a && S.draft.find(it => it.anchor === a.id && it.tid === S.tid); }
+function applyDraftChoice() {
+  const a = curAnchor(), it = draftItem();
+  if (it) S.para = it.para;
+  if (a && S.mod === 'text' && !a.text_ok) S.mod = 'contour';
+}
+
+/* ---- canvas */
+function fit() {
+  const box = $('#bc .body'); if (!box || !S.w || box.clientWidth < 80) return;
+  const aw = box.clientWidth - 30, ah = Math.max(260, window.innerHeight - 190);
+  S.scale = Math.min(aw / S.w, ah / S.h, 3);
+  $('#cv').style.width = Math.round(S.w * S.scale) + 'px'; $('#cv').style.height = Math.round(S.h * S.scale) + 'px';
+}
+window.addEventListener('resize', () => { fit(); });
+const COL = { halo: [0, 0, 0], subj: [214, 31, 214], S: [34, 197, 94], U: [245, 166, 35], N: [205, 205, 200], P: [79, 195, 247], O: [255, 255, 255], hov: [255, 255, 0] };
+function paint(d, W, H, x, y, r, c, a) {
+  for (let yy = Math.max(0, y - r); yy <= Math.min(H - 1, y + r); yy++) for (let xx = Math.max(0, x - r); xx <= Math.min(W - 1, x + r); xx++) {
+    const o = (yy * W + xx) * 4;
+    d[o] = d[o] * (1 - a) + c[0] * a; d[o + 1] = d[o + 1] * (1 - a) + c[1] * a; d[o + 2] = d[o + 2] * (1 - a) + c[2] * a;
+  }
+}
+function ruleSets() {
+  const a = curAnchor(), r = a && a.rules[S.tid];
+  const t = tmpl(S.tid), cm = a && cellsOf(a, r), Oset = new Set();
+  if (cm) for (const [id, c] of Object.entries(cm)) if (isOppCell(t, c)) Oset.add(+id);
+  return { r, Sset: new Set(r ? r.S : []), Uset: new Set(r ? r.U : []), Cset: new Set(r ? r.ch : []), Oset, cm };
+}
+let drawQueued = false;
+function drawSoon() { if (!drawQueued) { drawQueued = true; requestAnimationFrame(() => { drawQueued = false; draw(); }); } }
+function draw() {
+  const cv = $('#cv'), W = S.w, H = S.h, a = curAnchor();
+  if (!W) return;
+  cv.width = W; cv.height = H; fit();
+  const ctx = cv.getContext('2d', { willReadFrequently: true });
+  if (S.img) ctx.drawImage(S.img, 0, 0, W, H); else { ctx.fillStyle = '#6d6d6a'; ctx.fillRect(0, 0, W, H); }
+  if (!S.ids || !a) return;
+  const sc = S.scale, { r, Sset, Uset, Cset, Oset } = ruleSets(), showAll = $('#showAll').checked;
+  const role = new Uint8Array(65536); // 1 subj, 2 S, 3 U, 4 N, 5 plain cand, 6 other
+  for (const c of a.cands) role[c] = r ? (Sset.has(c) ? 2 : Uset.has(c) ? 3 : 4) : 5;
+  role[a.id] = 1;
+  const im = ctx.getImageData(0, 0, W, H), d = im.data, ids = S.ids;
+  const edges = [null, [], [], [], [], [], []], hov = S.hoverId, hedge = [];
+  for (let p = 0; p < ids.length; p++) {
+    const id = ids[p]; if (!id) continue;
+    let k = role[id];
+    if (!k) { if (showAll) k = 6; else if (id !== hov) continue; }
+    const x = p % W, y = (p / W) | 0, o = p * 4;
+    if (k === 2) { d[o] = d[o] * .68 + COL.S[0] * .32; d[o + 1] = d[o + 1] * .68 + COL.S[1] * .32; d[o + 2] = d[o + 2] * .68 + COL.S[2] * .32; }
+    else if (k === 3 && ((x + y) & 7) < 3) { d[o] = d[o] * .45 + COL.U[0] * .55; d[o + 1] = d[o + 1] * .45 + COL.U[1] * .55; d[o + 2] = d[o + 2] * .45 + COL.U[2] * .55; }
+    else if (k === 1) { d[o] = d[o] * .88 + COL.subj[0] * .12; d[o + 1] = d[o + 1] * .88 + COL.subj[1] * .12; d[o + 2] = d[o + 2] * .88 + COL.subj[2] * .12; }
+    const edge = (x + 1 < W && ids[p + 1] !== id) || (x > 0 && ids[p - 1] !== id) || (y + 1 < H && ids[p + W] !== id) || (y > 0 && ids[p - W] !== id);
+    if (edge) { if (k) edges[k].push(p); if (id === hov) hedge.push(p); }
+  }
+  const rS = Math.max(1, Math.round(1.5 / sc)), rC = sc < 1 ? 0 : 0;
+  const names = [null, 'subj', 'S', 'U', 'N', 'P', 'O'];
+  for (let k = 6; k >= 1; k--) for (const p of edges[k]) paint(d, W, H, p % W, (p / W) | 0, (k === 1 ? rS : rC) + 1, COL.halo, k === 6 ? .25 : .5);
+  for (let k = 6; k >= 1; k--) {
+    const rad = k === 1 ? rS : rC, c = COL[names[k]];
+    for (const p of edges[k]) {
+      const x = p % W, y = (p / W) | 0;
+      if (k === 3 && (((x + y) >> 2) & 1)) continue;
+      paint(d, W, H, x, y, rad, c, k === 6 ? .55 : 1);
+    }
+  }
+  for (const p of hedge) paint(d, W, H, p % W, (p / W) | 0, rS, COL.halo, .6);
+  for (const p of hedge) paint(d, W, H, p % W, (p / W) | 0, Math.max(0, rS - 1), COL.hov, 1);
+  ctx.putImageData(im, 0, 0);
+  if (!$('#showMarks').checked) return;
+  const fs = Math.max(9, Math.min(34, 12.5 / sc));
+  ctx.font = `700 ${fs}px ui-monospace, monospace`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  for (const id of [...a.cands, a.id]) {
+    const m = (S.rec.marks || {})[id]; if (!m) continue;
+    const k = role[id], txt = String(id), tw = ctx.measureText(txt).width + fs * .6, th = fs * 1.15;
+    const bg = k === 1 ? 'rgb(214,31,214)' : k === 2 ? 'rgb(24,120,60)' : k === 3 ? 'rgb(217,138,11)' : k === 4 ? 'rgb(80,80,78)' : 'rgb(30,100,160)';
+    ctx.fillStyle = bg; ctx.strokeStyle = id === hov ? '#ff0' : 'rgba(255,255,255,.9)'; ctx.lineWidth = (id === hov ? 3 : 1.5) / sc;
+    ctx.beginPath(); ctx.roundRect(m[0] - tw / 2, m[1] - th / 2, tw, th, th / 2); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#fff'; ctx.fillText(txt, m[0], m[1] + .5 / sc);
+    if (Cset.has(id)) { // counter-heuristic marker
+      const cx = m[0] + tw / 2, cy = m[1] - th / 2, s = fs * .42;
+      ctx.fillStyle = '#e0453a'; ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.2 / sc;
+      ctx.beginPath(); ctx.moveTo(cx, cy - s); ctx.lineTo(cx + s, cy); ctx.lineTo(cx, cy + s); ctx.lineTo(cx - s, cy); ctx.closePath(); ctx.fill(); ctx.stroke();
+    }
+    if (Oset.has(id)) { // opportunity-cell marker: triangle at the lower-left corner
+      const cx = m[0] - tw / 2, cy = m[1] + th / 2, s = fs * .5;
+      ctx.fillStyle = '#2f6fde'; ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.2 / sc;
+      ctx.beginPath(); ctx.moveTo(cx, cy - s); ctx.lineTo(cx + s, cy + s * .7); ctx.lineTo(cx - s, cy + s * .7); ctx.closePath(); ctx.fill(); ctx.stroke();
+    }
+  }
+}
+$('#showAll').onchange = $('#showMarks').onchange = draw;
+
+function setHover(id) {
+  if (S.hoverId === id) return;
+  S.hoverId = id;
+  document.querySelectorAll('#ptable tr.row, .chip[data-id], .tag[data-ids]').forEach(e => {
+    const on = e.dataset.id ? +e.dataset.id === id : e.dataset.ids.split(',').includes(String(id));
+    e.classList.toggle('hl', id != null && on);
+  });
+  drawSoon();
+}
+$('#cv').addEventListener('mousemove', e => {
+  if (!S.ids) return;
+  const rc = e.target.getBoundingClientRect(), x = Math.floor((e.clientX - rc.left) * S.w / rc.width), y = Math.floor((e.clientY - rc.top) * S.h / rc.height);
+  const id = S.ids[y * S.w + x], tip = $('#tip'), a = curAnchor();
+  if (!id) { tip.style.display = 'none'; setHover(null); return; }
+  const seg = S.rec.segs.find(s => s.id === id), { Sset, Uset, Oset, cm } = ruleSets();
+  const role = id === a?.id ? 'subject' : a?.cands.includes(id) ? (Sset.has(id) ? 'in S*' : Uset.has(id) ? 'in U' : 'not selected') : 'not a candidate';
+  const cellTxt = cm && cm[id] ? ` · cell ${cm[id]}${Oset.has(id) ? ' (opportunity)' : ''}` : '';
+  tip.innerHTML = `<b>${id}</b> · ${esc(seg ? seg.cat : 'stuff')} · ${role}${cellTxt}` + (seg && seg.why ? `<br>${esc(seg.stage || '–')}: ${esc(seg.why)}` : '');
+  tip.style.display = 'block'; tip.style.left = e.clientX + 14 + 'px'; tip.style.top = e.clientY + 12 + 'px';
+  setHover(id);
+});
+$('#cv').addEventListener('mouseleave', () => { $('#tip').style.display = 'none'; setHover(null); });
+
+/* ---- right panel + table */
+const PCOLS = ['same_cat', 'larger', 'smaller', 'touch', 'left', 'above', 'border'];
+function usedCols(tid) {
+  if (!tid || !S.sum) return new Set();
+  const t = S.sum.templates.find(x => x.id === tid), u = new Set(t.probe);
+  if (u.has('touches')) { u.delete('touches'); u.add('touch'); }
+  return u;
+}
+function cell(col, q, a, id, used) {
+  const v = q[col], c = v === true ? 't' : v === false ? 'f' : 'u', sym = v === true ? '✓' : v === false ? '✗' : 'U';
+  const sub = { same_cat: a.cand_cats[id], larger: '×' + q.ratio, smaller: '×' + q.ratio, touch: q.gap == null ? 'gap ∞' : 'gap ' + q.gap + 'px',
+    left: 'dx ' + q.dx, above: 'dy ' + q.dy, border: 'edge ' + q.edge + 'px' }[col];
+  const tt = { larger: 'candidate area / subject area', smaller: 'candidate area / subject area', touch: 'pixel gap between outlines', left: 'subject leftmost x − candidate centre x (>0: left)',
+    above: 'subject topmost y − candidate centre y (>0: above)', border: 'distance to the image edge', same_cat: 'candidate category' }[col];
+  return `<td class="${c}${used ? ' used' : ''}" title="${esc(tt + ': ' + sub)}">${sym}<small>${esc(sub)}</small></td>`;
+}
+function renderTable() {
+  const a = curAnchor(), el = $('#ptable');
+  if (!a) { el.innerHTML = '<tr><td class="muted">no subject</td></tr>'; $('#ptitle').textContent = ''; return; }
+  const { r, Sset, Uset, Cset, Oset, cm } = ruleSets(), used = usedCols(S.tid), t13 = !!(tmpl(S.tid) && tmpl(S.tid).closure), tt = tmpl(S.tid);
+  $('#ptitle').textContent = `subject #${a.id} (${a.cat})${S.tid ? ' · highlighted columns = predicates used by ' + S.tid : ''}`;
+  const touches = {};
+  if (t13) for (const [x, y, v] of a.cc) { (touches[x] ??= []).push(y + (v ? '' : '?')); (touches[y] ??= []).push(x + (v ? '' : '?')); }
+  el.innerHTML = `<tr><th class="l">cand</th>${PCOLS.map(c => `<th class="${used.has(c) ? 'used' : ''}">${c}</th>`).join('')}${t13 ? '<th class="used">touches (cand–cand)</th>' : ''}${cm ? `<th class="used" title="truth-table cell: one letter per primitive of ${S.tid} (${tt ? (tt.prims || tt.probe).join(', ') : ''})${t13 ? '; for the closure the 2nd letter means: added because it touches a same-kind object' : ''}">cell ${tt ? '<small>' + (tt.prims || tt.probe).join(' ').replace('touches', 'touches*') + '</small>' : ''}</th>` : ''}<th>GT ${S.tid || ''}</th><th class="l">counter-heuristic on</th></tr>` +
+    [...a.cands].sort((x, y) => x - y).map(id => {
+      const q = a.preds[id], k = Sset.has(id) ? 'S' : Uset.has(id) ? 'U' : '';
+      return `<tr class="row g${k}${Oset.has(id) ? ' opp' : ''}" data-id="${id}"><td class="l mono"><b>#${id}</b> ${esc(a.cand_cats[id])}</td>${PCOLS.map(c => cell(c, q, a, id, used.has(c))).join('')}
+        ${t13 ? `<td class="used mono">${(touches[id] || []).sort((x, y) => parseInt(x) - parseInt(y)).join(', ') || '–'}</td>` : ''}
+        ${cm ? `<td class="cellc used" title="${Oset.has(id) ? 'opportunity cell: the NOT / EXCEPT / closure clause decides here' : ''}">${esc(cm[id] || '')}${Oset.has(id) ? ' ▲' : ''}</td>` : ''}
+        <td class="gt">${!r ? '' : k === 'S' ? 'S*' : k === 'U' ? 'U' : '–'}</td>
+        <td class="l small" style="color:var(--ch)">${(a.ch[id] || []).join(', ')}${Cset.has(id) ? ' ◆' : ''}</td></tr>`;
+    }).join('');
+}
+function chips(ids, cls, a) { return ids.length ? ids.map(i => `<span class="chip ${cls}" data-id="${i}">${i} <span class="muted">${esc(a.cand_cats[i] || '')}</span></span>`).join('') : '<span class="muted">∅</span>'; }
+function renderDetail() {
+  const rec = S.rec, a = curAnchor(), sum = S.sum;
+  if (!rec) return;
+  const sc = rec.scene || {};
+  let h = `<div><b class="mono">${rec.split}/${rec.key}</b> <span class="muted">${rec.W}×${rec.H}</span> <span class="badge ${rec.img_stage === 'rule_kept' ? 'ok' : 'warn'}">${esc(rec.img_stage)}</span></div>
+    <div class="small muted" style="margin:3px 0">verify: ${esc(rec.verify)} · io: ${esc(sc.io)} (mask: ${esc(sc.io_stuff)}) · settings: ${esc((sc.settings || []).join(', ') || '–')} · food: ${esc(sc.food)} · people(mask): ${esc(rec.people_mask)}</div>`;
+  if (S.draft.length) h += `<div class="small" style="margin:3px 0">In draft test: ${S.draft.map(it => `<span class="badge ok mono" title="${esc(it.item_id)}">${it.tid} · ${it.role} · ${esc(it.group)} · p${it.para} · n=${it.n}${it.fire ? ' · fire ' + it.fire : ''}</span>`).join(' ')}</div>`;
+  h += `<h3>Subject${rec.anchors.length > 1 ? 's (' + rec.anchors.length + ')' : ''}</h3>`;
+  if (!rec.anchors.length) h += '<div class="muted">No subject reached the clutter stage in this image.</div>';
+  for (const x of rec.anchors) {
+    const nk = Object.values(x.rules).filter(r => r.keep).length;
+    h += `<div class="acard ${x.id === S.aid ? 'on' : ''} ${nk ? '' : 'dim'}" data-aid="${x.id}">
+      <div><b class="mono" style="color:var(--subj)">#${x.id}</b> <b>“${esc(x.phrase)}”</b> <span class="muted">${esc(x.cat)}</span> <span class="badge">${(x.frac * 100).toFixed(1)}% of image</span>
+      <span class="badge">${x.cands.length} cands</span> ${nk ? `<span class="badge ok">${nk}/${Object.keys(x.rules).length} rules kept</span>` : '<span class="badge err">all rules dropped</span>'}</div>
+      <div class="small muted">phrase_status <b>${esc(x.phrase_status)}</b> · flags ${esc((x.flags || []).join(', ') || '–')} · text_ok <b style="color:${x.text_ok ? 'var(--ok)' : 'var(--err)'}">${x.text_ok}</b>
+      · type_cat <b>${esc(x.type_cat)}</b> vs type_phrase <b style="${x.type_cat !== x.type_phrase && x.type_phrase !== 'unknown' ? 'color:var(--err)' : ''}">${esc(x.type_phrase)}</b></div></div>`;
+  }
+  const rej = rec.segs.filter(s => s.why);
+  h += `<details><summary>${rej.length} thing segments rejected as subjects (many are still candidates)</summary><table class="small"><tr><th>id</th><th>cat</th><th class="num">px</th><th>reached</th><th>why</th></tr>` +
+    rej.map(s => `<tr data-hid="${s.id}" style="cursor:default"><td>${s.id}</td><td>${esc(s.cat)}</td><td class="num">${fmt(s.area)}</td><td>${esc(s.stage || '–')}</td><td>${esc(s.why)}</td></tr>`).join('') + `</table></details>`;
+  if (a) {
+    h += `<h3>Rule</h3><div class="rgrid">` + Object.entries(a.rules).map(([tid, r]) => {
+      const t = sum && sum.templates.find(x => x.id === tid);
+      return `<button class="rbtn ${tid === S.tid ? 'on' : ''} ${r.keep ? '' : 'drop'}" data-tid="${tid}" title="${r.keep ? 'kept' : 'dropped: more than ' + (sum ? sum.thresholds.U_DROP * 100 : 30) + '% of candidates in U'}">
+        <b class="mono">${tid}</b><span class="rn">${esc(t ? t.name : '')}</span><span class="rc"><span style="color:var(--gS)">S${r.S.length}</span> <span style="color:var(--gU)">U${r.U.length}</span>${r.fire > 0 ? ` <span style="color:var(--accent)" title="${r.fire} candidates in the opportunity cell">▲${r.fire}</span>` : ''}</span></button>`;
+    }).join('') + `</div>`;
+    const r = a.rules[S.tid];
+    if (r) {
+      const t = sum && sum.templates.find(x => x.id === S.tid);
+      h += `<h3>${S.tid} ${t ? esc(t.name) : ''} <span class="badge ${r.keep ? 'ok' : 'err'}">${r.keep ? 'kept' : 'dropped'}</span> ${t && t.calibration ? '<span class="badge warn">calibration</span>' : ''}
+        ${t && sum.extensional_twins.some(p => p.includes(S.tid)) ? '<span class="badge warn">extensional twin</span>' : ''}</h3>
+        <div><b style="color:var(--gS)">S*</b> (${r.S.length}) ${chips(r.S, 'S', a)}</div>
+        <div><b style="color:var(--gU)">U</b> (${r.U.length}, ${pct(r.U.length, a.cands.length, 0)} of candidates) ${chips(r.U, 'U', a)}</div>
+        <div><b style="color:var(--ch)">counter-heuristic</b> ${chips(r.ch, 'C', a)}</div>
+        ${hasOpp(t) ? `<div><b style="color:var(--accent)">opportunity</b>: ${r.fire ?? 0} candidate${r.fire === 1 ? '' : 's'} where the clause decides ${chips([...ruleSets().Oset].sort((x, y) => x - y), 'O', a)}</div>` : ''}
+        <h3>Question</h3>
+        <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">
+          <div class="seg" id="modSeg">${['text', 'contour', 'mark'].map(m => `<button data-mod="${m}" class="${S.mod === m ? 'on' : ''}" ${m === 'text' && !a.text_ok ? 'disabled title="text_ok is false for this subject"' : ''}>${m}</button>`).join('')}</div>
+          <div class="seg" id="paraSeg"><span class="muted">paraphrase</span>${[0, 1, 2].map(p => `<button data-para="${p}" class="${S.para === p ? 'on' : ''}">${p}</button>`).join('')}</div></div>`;
+      const it = draftItem();
+      h += it ? `<div class="small" style="margin-top:4px"><span class="badge ok">in test_draft</span> role <b>${esc(it.role)}</b> · group <span class="mono">${esc(it.group)}</span> · runs in <b>${(it.modalities || []).join(' + ')}</b> · paraphrase <b>${it.para}</b>${it.para === S.para ? '' : ' <button id="useDraft">use</button>'} · ${esc(it.item_id)}</div>`
+        : `<div class="small muted" style="margin-top:4px">not in test_draft</div>`;
+      h += `<h3>Direct question <span class="muted" style="text-transform:none;letter-spacing:0">(${S.mod} × paraphrase ${S.para})</span></h3><pre class="q" id="qDirect">…</pre>
+        <h3>Shared probe — all primitives${t && t.closure ? ' + touches' : ''} <span class="muted" style="text-transform:none;letter-spacing:0">(once per image, anchor, modality: ${S.mod})</span></h3><pre class="q" id="qProbeAll">…</pre>
+        <h3>Rule-specific probe <span class="muted" style="text-transform:none;letter-spacing:0">(Lite equivalence check only)</span></h3><pre class="q" id="qProbe">…</pre>
+        <div class="small muted">Expected answer: <span class="mono">[${r.S.join(', ')}]</span></div>`;
+    }
+  }
+  h += `<h3>Caption</h3><div id="caption">${renderCaption(a)}</div>`;
+  $('#detail').innerHTML = h;
+  renderTable();
+  if (a && a.rules[S.tid]) fetchRender();
+}
+function renderCaption(a) {
+  if (S.cap.caption == null) return '<span class="muted">no caption</span>';
+  const cands = new Set(a ? a.cands : []);
+  return S.cap.tokens.map(t => {
+    if (t.type === 'text') return esc(t.text);
+    const subj = a && t.ids.includes(a.id), cand = t.ids.some(i => cands.has(i));
+    return `<span class="tag ${subj ? 'subj-t' : cand ? 'cand' : ''}" data-ids="${t.ids.join(',')}" title="${esc(t.raw)}"><sup>${t.ids.join(',')}</sup>${esc(t.text)}</span>`;
+  }).join('');
+}
+async function fetchRender() {
+  const a = curAnchor(), tok = ++S.renderTok; if (!a) return;
+  const p = new URLSearchParams({ tid: S.tid, para: S.para, modality: S.mod, phrase: a.phrase, sid: a.id });
+  try {
+    const j = await jget('/api/render?' + p);
+    if (tok !== S.renderTok) return;
+    $('#qDirect').textContent = j.direct; $('#qProbeAll').textContent = j.probe_all; $('#qProbe').textContent = j.probe;
+  } catch (e) { if ($('#qDirect')) $('#qDirect').textContent = String(e); }
+}
+$('#detail').addEventListener('click', e => {
+  const t = e.target;
+  const ac = t.closest('[data-aid]'); if (ac) { S.aid = +ac.dataset.aid; selectRuleDefault(); draw(); renderDetail(); setHash(); return; }
+  const rb = t.closest('[data-tid]'); if (rb) { S.tid = rb.dataset.tid; applyDraftChoice(); draw(); renderDetail(); setHash(); return; }
+  const m = t.closest('[data-mod]'); if (m && !m.disabled) { S.mod = m.dataset.mod; renderDetail(); return; }
+  const pa = t.closest('[data-para]'); if (pa) { S.para = +pa.dataset.para; renderDetail(); return; }
+  if (t.id === 'useDraft') { applyDraftChoice(); renderDetail(); }
+});
+for (const sel of ['#detail', '#ptable']) {
+  $(sel).addEventListener('mouseover', e => {
+    const t = e.target.closest('[data-id],[data-hid],[data-ids]'); if (!t) { setHover(null); return; }
+    setHover(t.dataset.id ? +t.dataset.id : t.dataset.hid ? +t.dataset.hid : +t.dataset.ids.split(',')[0]);
+  });
+  $(sel).addEventListener('mouseleave', () => setHover(null));
+}
+
+/* ---- keyboard */
+document.addEventListener('keydown', async e => {
+  if (S.tab !== 'browse' || e.altKey || e.ctrlKey || e.metaKey) return;
+  if (['INPUT', 'SELECT', 'TEXTAREA'].includes(e.target.tagName) && e.target.type !== 'checkbox') return;
+  if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+  e.preventDefault();
+  const L = S.list;
+  let i = L.items.findIndex(it => it.key === S.key) + (e.key === 'ArrowRight' ? 1 : -1);
+  if (i >= L.items.length && L.offset + L.limit < L.total) { L.offset += L.limit; await loadList(); i = 0; }
+  else if (i < 0 && L.offset > 0) { L.offset -= L.limit; await loadList(); i = L.items.length - 1; }
+  if (L.items[i]) { openImage(L.items[i].key); document.querySelector(`.item[data-key="${L.items[i].key}"]`)?.scrollIntoView({ block: 'nearest' }); }
+});
+
+/* ------------------------------------------------------------------ init */
+async function init() {
+  const j = await jget('/api/summary');
+  S.sum = j.summary; S.splits = j.splits; S.sizes = j.split_sizes;
+  renderFunnel(); renderRules();
+  const p = new URLSearchParams(location.hash.slice(1));
+  S.split = S.splits.includes(p.get('split')) ? p.get('split') : S.splits[0];
+  $('#topmsg').textContent = S.splits.length ? `splits: ${S.splits.join(', ')} · draft items: ${fmt(j.draft_n)}` : 'no split generated yet';
+  showTab(['funnel', 'rules', 'browse'].includes(p.get('tab')) ? p.get('tab') : 'funnel');
+  if (!S.split) { $('#flist').innerHTML = '<div style="padding:10px" class="muted">No anchor_gt split on disk.</div>'; return; }
+  $('#f_split').innerHTML = S.splits.map(s => `<option>${s}</option>`).join(''); $('#f_split').value = S.split;
+  await loadFilters(); S.f = {}; syncFilterUI();
+  if (p.get('key')) {
+    S.f.stage = ''; $('#f_stage').value = 'all'; 
+    await loadList();
+    await openImage(p.get('key'), p.get('a') ? +p.get('a') : undefined, p.get('r') || undefined);
+  } else await loadList(true);
+}
+init().catch(e => { document.body.insertAdjacentHTML('beforeend', `<pre style="color:red">${esc(e.stack || e)}</pre>`); });
+</script>
+</body>
+</html>

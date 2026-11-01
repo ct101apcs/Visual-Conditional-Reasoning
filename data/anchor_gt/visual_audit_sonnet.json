@@ -1,0 +1,2325 @@
+{
+ "method": "blind visual judgement by Claude Sonnet agents on 64 draft Test items (4 per template), images rendered with subject contour and candidate marks; COCO categories were shown, so same_cat is not blind",
+ "items": [
+  {
+   "n": 0,
+   "tid": "T01",
+   "split": "val",
+   "key": "000000529939",
+   "anchor": 29,
+   "gt_S": [
+    25,
+    26,
+    27
+   ],
+   "gt_U": [],
+   "judge": {
+    "9": "no",
+    "10": "no",
+    "11": "no",
+    "12": "no",
+    "13": "no",
+    "15": "no",
+    "16": "no",
+    "17": "no",
+    "18": "no",
+    "19": "no",
+    "20": "no",
+    "21": "no",
+    "23": "no",
+    "24": "no",
+    "25": "yes",
+    "26": "yes",
+    "27": "yes"
+   },
+   "flags": [
+    {
+     "code": "occlusion_touch",
+     "ids": [
+      25,
+      26,
+      27
+     ],
+     "note": "boards lean behind the man; contact is overlap"
+    },
+    {
+     "code": "label_wrong",
+     "ids": [
+      25
+     ],
+     "note": "caption 'wooden door' for a surfboard-like object"
+    },
+    {
+     "code": "unmarked_relevant",
+     "ids": [],
+     "note": "yellow/green board behind 27 unmarked (not touching)"
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "n": 1,
+   "tid": "T01",
+   "split": "train",
+   "key": "000000017313",
+   "anchor": 23,
+   "gt_S": [
+    7,
+    8,
+    12,
+    13,
+    15
+   ],
+   "gt_U": [],
+   "judge": {
+    "7": "yes",
+    "8": "yes",
+    "9": "no",
+    "10": "no",
+    "11": "no",
+    "12": "yes",
+    "13": "yes",
+    "14": "yes",
+    "15": "unclear",
+    "16": "no",
+    "18": "no"
+   },
+   "flags": [
+    {
+     "code": "occlusion_touch",
+     "ids": [
+      7,
+      8,
+      12
+     ],
+     "note": "people stand behind/in front of table; outlines meet by overlap"
+    },
+    {
+     "code": "other",
+     "ids": [
+      13,
+      14,
+      15
+     ],
+     "note": "bottles/sign area tiny and ambiguous; contact with table hard to verify"
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "n": 2,
+   "tid": "T01",
+   "split": "train",
+   "key": "000000525668",
+   "anchor": 19,
+   "gt_S": [
+    14
+   ],
+   "gt_U": [
+    13,
+    18
+   ],
+   "judge": {
+    "9": "no",
+    "11": "no",
+    "12": "no",
+    "13": "no",
+    "14": "no",
+    "15": "no",
+    "16": "no",
+    "17": "no",
+    "18": "unclear",
+    "20": "no",
+    "24": "no",
+    "36": "no"
+   },
+   "flags": [
+    {
+     "code": "other",
+     "ids": [
+      18
+     ],
+     "note": "microwave bottom corner and oven top corner within ~10px; gap vs touch unclear"
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "n": 3,
+   "tid": "T01",
+   "split": "train",
+   "key": "000000451407",
+   "anchor": 5,
+   "gt_S": [
+    8
+   ],
+   "gt_U": [],
+   "judge": {
+    "6": "no",
+    "7": "no",
+    "8": "yes",
+    "9": "no"
+   },
+   "flags": [
+    {
+     "code": "label_wrong",
+     "ids": [
+      8
+     ],
+     "note": "caption says white plate but COCO dining table; outline is plate/table hybrid"
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "n": 4,
+   "tid": "T02",
+   "split": "val",
+   "key": "000000254516",
+   "anchor": 7,
+   "gt_S": [],
+   "gt_U": [],
+   "judge": {
+    "4": "no",
+    "5": "no",
+    "6": "no",
+    "8": "no",
+    "9": "no",
+    "10": "no",
+    "11": "no",
+    "12": "no",
+    "13": "no",
+    "14": "no",
+    "16": "no",
+    "18": "no",
+    "19": "no"
+   },
+   "flags": [],
+   "confidence": "high"
+  },
+  {
+   "n": 5,
+   "tid": "T02",
+   "split": "train",
+   "key": "000000373758",
+   "anchor": 5,
+   "gt_S": [],
+   "gt_U": [],
+   "judge": {
+    "6": "unclear",
+    "7": "unclear",
+    "9": "no",
+    "10": "no",
+    "11": "no",
+    "13": "no",
+    "14": "no",
+    "15": "no",
+    "17": "no",
+    "25": "no",
+    "26": "no",
+    "27": "no"
+   },
+   "flags": [
+    {
+     "code": "other",
+     "ids": [
+      6,
+      7
+     ],
+     "note": "cars vs cow area very close to call"
+    }
+   ],
+   "confidence": "low"
+  },
+  {
+   "n": 6,
+   "tid": "T02",
+   "split": "train",
+   "key": "000000416159",
+   "anchor": 6,
+   "gt_S": [
+    8
+   ],
+   "gt_U": [
+    9,
+    11
+   ],
+   "judge": {
+    "7": "no",
+    "8": "yes",
+    "9": "no",
+    "10": "no",
+    "11": "no",
+    "12": "no",
+    "13": "no",
+    "14": "no",
+    "15": "no",
+    "17": "no",
+    "18": "no",
+    "19": "no",
+    "20": "no",
+    "21": "no",
+    "23": "no"
+   },
+   "flags": [
+    {
+     "code": "other",
+     "ids": [
+      12,
+      9,
+      17
+     ],
+     "note": "label 12 outlines only the backpack; 9 only legs; person parts split among marks; subject bus is largely cut off/occluded by people"
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "n": 7,
+   "tid": "T02",
+   "split": "val",
+   "key": "000000254516",
+   "anchor": 7,
+   "gt_S": [],
+   "gt_U": [],
+   "judge": {
+    "4": "no",
+    "5": "no",
+    "6": "no",
+    "8": "no",
+    "9": "no",
+    "10": "no",
+    "11": "no",
+    "12": "no",
+    "13": "no",
+    "14": "no",
+    "16": "no",
+    "18": "no",
+    "19": "no"
+   },
+   "flags": [],
+   "confidence": "high"
+  },
+  {
+   "n": 8,
+   "tid": "T03",
+   "split": "train",
+   "key": "000000452767",
+   "anchor": 11,
+   "gt_S": [],
+   "gt_U": [],
+   "judge": {
+    "3": "no",
+    "4": "no",
+    "5": "no",
+    "6": "no",
+    "7": "no",
+    "8": "no",
+    "9": "no",
+    "10": "no"
+   },
+   "flags": [
+    {
+     "code": "label_wrong",
+     "ids": [
+      10
+     ],
+     "note": "trophy shield labelled person"
+    },
+    {
+     "code": "other",
+     "ids": [],
+     "note": "subject is two disjoint bench pieces occluded by people"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "n": 9,
+   "tid": "T03",
+   "split": "val",
+   "key": "000000180560",
+   "anchor": 8,
+   "gt_S": [
+    4,
+    5,
+    6
+   ],
+   "gt_U": [],
+   "judge": {
+    "4": "yes",
+    "5": "yes",
+    "6": "yes",
+    "7": "no"
+   },
+   "flags": [
+    {
+     "code": "subject_bad",
+     "ids": [],
+     "note": "magenta object is a hanging tie/lamp-like shape, not clearly a handbag"
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "n": 10,
+   "tid": "T03",
+   "split": "train",
+   "key": "000000331139",
+   "anchor": 14,
+   "gt_S": [
+    12,
+    18
+   ],
+   "gt_U": [],
+   "judge": {
+    "12": "yes",
+    "18": "yes",
+    "19": "no",
+    "28": "no"
+   },
+   "flags": [
+    {
+     "code": "other",
+     "ids": [],
+     "note": "subject sink is only a small visible piece at bottom; leftmost point ~x=520"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "n": 11,
+   "tid": "T03",
+   "split": "train",
+   "key": "000000331139",
+   "anchor": 14,
+   "gt_S": [
+    12,
+    18
+   ],
+   "gt_U": [],
+   "judge": {
+    "12": "yes",
+    "18": "yes",
+    "19": "no",
+    "28": "no"
+   },
+   "flags": [
+    {
+     "code": "subject_bad",
+     "ids": [],
+     "note": "sink outline looks partial/dark, hard to confirm"
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "n": 12,
+   "tid": "T04",
+   "split": "train",
+   "key": "000000035820",
+   "anchor": 7,
+   "gt_S": [
+    3,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ],
+   "gt_U": [],
+   "judge": {
+    "3": "yes",
+    "4": "no",
+    "5": "no",
+    "6": "no",
+    "8": "no",
+    "9": "no",
+    "10": "no",
+    "11": "yes",
+    "12": "yes",
+    "13": "yes",
+    "14": "yes",
+    "15": "unclear",
+    "16": "yes",
+    "17": "yes",
+    "18": "yes"
+   },
+   "flags": [],
+   "confidence": "medium"
+  },
+  {
+   "n": 13,
+   "tid": "T04",
+   "split": "train",
+   "key": "000000352703",
+   "anchor": 8,
+   "gt_S": [
+    9,
+    10,
+    14,
+    18,
+    19,
+    20,
+    21
+   ],
+   "gt_U": [],
+   "judge": {
+    "9": "yes",
+    "10": "yes",
+    "11": "no",
+    "13": "no",
+    "14": "unclear",
+    "17": "no",
+    "18": "yes",
+    "19": "yes",
+    "20": "yes",
+    "21": "yes"
+   },
+   "flags": [
+    {
+     "code": "label_wrong",
+     "ids": [
+      20
+     ],
+     "note": "'handbag' is a metal pole / thin object"
+    },
+    {
+     "code": "other",
+     "ids": [
+      14
+     ],
+     "note": "centre y approx equal to subject top"
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "n": 14,
+   "tid": "T04",
+   "split": "val",
+   "key": "000000447522",
+   "anchor": 11,
+   "gt_S": [],
+   "gt_U": [],
+   "judge": {
+    "1": "no",
+    "2": "no",
+    "3": "no",
+    "5": "no",
+    "6": "no",
+    "7": "no",
+    "8": "no",
+    "9": "no",
+    "10": "no",
+    "12": "no",
+    "13": "no"
+   },
+   "flags": [
+    {
+     "code": "other",
+     "ids": [],
+     "note": "subject table touches image top, so no centre can be above its topmost point; rule trivially empty"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "n": 15,
+   "tid": "T04",
+   "split": "val",
+   "key": "000000553664",
+   "anchor": 6,
+   "gt_S": [],
+   "gt_U": [],
+   "judge": {
+    "5": "no",
+    "7": "no",
+    "8": "no",
+    "9": "no",
+    "11": "no",
+    "31": "no",
+    "36": "no"
+   },
+   "flags": [
+    {
+     "code": "label_wrong",
+     "ids": [
+      11
+     ],
+     "note": "black leather bag/cushion with hat, not a chair"
+    },
+    {
+     "code": "unmarked_relevant",
+     "ids": [],
+     "note": "many shelf books above the backpack are unmarked"
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "n": 16,
+   "tid": "T05",
+   "split": "train",
+   "key": "000000516346",
+   "anchor": 7,
+   "gt_S": [],
+   "gt_U": [],
+   "judge": {
+    "8": "no",
+    "9": "no",
+    "10": "no",
+    "11": "no",
+    "12": "no",
+    "16": "no",
+    "17": "no",
+    "18": "no",
+    "19": "no"
+   },
+   "flags": [
+    {
+     "code": "label_wrong",
+     "ids": [
+      9,
+      10,
+      11,
+      12,
+      17,
+      18,
+      19
+     ],
+     "note": "these are dolls, labelled person"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "n": 17,
+   "tid": "T05",
+   "split": "train",
+   "key": "000000072657",
+   "anchor": 12,
+   "gt_S": [],
+   "gt_U": [],
+   "judge": {
+    "5": "no",
+    "6": "no",
+    "7": "no",
+    "8": "no",
+    "9": "no",
+    "10": "no",
+    "11": "no"
+   },
+   "flags": [
+    {
+     "code": "other",
+     "ids": [],
+     "note": "no other person candidate; correct set is empty. Subject mask fragmentary (stray bits at bottom-left)"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "n": 18,
+   "tid": "T05",
+   "split": "val",
+   "key": "000000295713",
+   "anchor": 17,
+   "gt_S": [
+    8,
+    10,
+    14,
+    15,
+    16
+   ],
+   "gt_U": [],
+   "judge": {
+    "8": "yes",
+    "10": "yes",
+    "12": "no",
+    "13": "no",
+    "14": "yes",
+    "15": "yes",
+    "16": "yes"
+   },
+   "flags": [
+    {
+     "code": "other",
+     "ids": [],
+     "note": "subject is a statue, labelled COCO person; category match depends on that"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "n": 19,
+   "tid": "T05",
+   "split": "train",
+   "key": "000000328940",
+   "anchor": 5,
+   "gt_S": [],
+   "gt_U": [],
+   "judge": {
+    "6": "no",
+    "7": "no",
+    "8": "no",
+    "9": "no"
+   },
+   "flags": [],
+   "confidence": "high"
+  },
+  {
+   "n": 20,
+   "tid": "T06",
+   "split": "train",
+   "key": "000000299643",
+   "anchor": 3,
+   "gt_S": [
+    7
+   ],
+   "gt_U": [],
+   "judge": {
+    "4": "no",
+    "5": "unclear",
+    "6": "no",
+    "7": "yes"
+   },
+   "flags": [],
+   "confidence": "low"
+  },
+  {
+   "n": 21,
+   "tid": "T06",
+   "split": "val",
+   "key": "000000151000",
+   "anchor": 10,
+   "gt_S": [
+    1
+   ],
+   "gt_U": [],
+   "judge": {
+    "1": "yes",
+    "2": "no",
+    "3": "no",
+    "5": "no",
+    "7": "no",
+    "9": "no",
+    "11": "no",
+    "12": "no",
+    "14": "no"
+   },
+   "flags": [],
+   "confidence": "medium"
+  },
+  {
+   "n": 22,
+   "tid": "T06",
+   "split": "train",
+   "key": "000000409982",
+   "anchor": 9,
+   "gt_S": [
+    4,
+    7
+   ],
+   "gt_U": [],
+   "judge": {
+    "4": "yes",
+    "6": "unclear",
+    "7": "yes",
+    "8": "no"
+   },
+   "flags": [
+    {
+     "code": "other",
+     "ids": [
+      6
+     ],
+     "note": "batter centre y~345 vs umpire top y~340; too close"
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "n": 23,
+   "tid": "T06",
+   "split": "train",
+   "key": "000000240950",
+   "anchor": 39,
+   "gt_S": [
+    24,
+    31
+   ],
+   "gt_U": [
+    26
+   ],
+   "judge": {
+    "17": "no",
+    "18": "no",
+    "20": "no",
+    "22": "no",
+    "23": "no",
+    "24": "yes",
+    "25": "no",
+    "26": "unclear",
+    "29": "no",
+    "30": "no",
+    "31": "yes",
+    "32": "no",
+    "34": "no",
+    "36": "no",
+    "37": "no",
+    "38": "no",
+    "40": "no",
+    "41": "no",
+    "44": "no"
+   },
+   "flags": [
+    {
+     "code": "label_wrong",
+     "ids": [
+      36
+     ],
+     "note": "white object on table, not a chair"
+    },
+    {
+     "code": "label_wrong",
+     "ids": [
+      20
+     ],
+     "note": "looks like a bench"
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "n": 24,
+   "tid": "T07",
+   "split": "train",
+   "key": "000000439117",
+   "anchor": 6,
+   "gt_S": [],
+   "gt_U": [],
+   "judge": {
+    "7": "no",
+    "8": "no",
+    "9": "no",
+    "13": "no"
+   },
+   "flags": [
+    {
+     "code": "label_wrong",
+     "ids": [
+      9
+     ],
+     "note": "looks like a foot/leg, not a hand (minor)"
+    }
+   ],
+   "confidence": "high"
+  },
+  {
+   "n": 25,
+   "tid": "T07",
+   "split": "val",
+   "key": "000000066771",
+   "anchor": 4,
+   "gt_S": [
+    3,
+    7,
+    9,
+    11,
+    12
+   ],
+   "gt_U": [
+    16
+   ],
+   "judge": {
+    "3": "yes",
+    "5": "no",
+    "6": "no",
+    "7": "unclear",
+    "8": "no",
+    "9": "unclear",
+    "11": "yes",
+    "12": "yes",
+    "13": "no",
+    "14": "no",
+    "15": "no",
+    "16": "no"
+   },
+   "flags": [
+    {
+     "code": "label_wrong",
+     "ids": [
+      16
+     ],
+     "note": "caption says smartphone but object is bench/seat; phone is 5"
+    },
+    {
+     "code": "other",
+     "ids": [
+      7,
+      9,
+      11
+     ],
+     "note": "bottom-edge contact marginal"
+    }
+   ],
+   "confidence": "low"
+  },
+  {
+   "n": 26,
+   "tid": "T07",
+   "split": "train",
+   "key": "000000578795",
+   "anchor": 12,
+   "gt_S": [],
+   "gt_U": [],
+   "judge": {
+    "7": "no",
+    "8": "no",
+    "10": "no",
+    "11": "no"
+   },
+   "flags": [
+    {
+     "code": "unmarked_relevant",
+     "ids": [],
+     "note": "parked cars at far left edge (~x0-50,y~345) unmarked; would be left of subject and touch edge"
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "n": 27,
+   "tid": "T07",
+   "split": "train",
+   "key": "000000024385",
+   "anchor": 10,
+   "gt_S": [
+    16,
+    17,
+    18,
+    19,
+    24,
+    25
+   ],
+   "gt_U": [
+    20
+   ],
+   "judge": {
+    "11": "no",
+    "12": "no",
+    "13": "no",
+    "14": "no",
+    "15": "no",
+    "16": "yes",
+    "17": "yes",
+    "18": "yes",
+    "19": "yes",
+    "20": "unclear",
+    "21": "no",
+    "22": "no",
+    "24": "yes",
+    "25": "yes",
+    "26": "no"
+   },
+   "flags": [],
+   "confidence": "medium"
+  },
+  {
+   "n": 28,
+   "tid": "T08",
+   "split": "train",
+   "key": "000000563712",
+   "anchor": 3,
+   "gt_S": [
+    6
+   ],
+   "gt_U": [],
+   "judge": {
+    "4": "no",
+    "5": "no",
+    "6": "yes",
+    "7": "no"
+   },
+   "flags": [],
+   "confidence": "high"
+  },
+  {
+   "n": 29,
+   "tid": "T08",
+   "split": "train",
+   "key": "000000574590",
+   "anchor": 8,
+   "gt_S": [
+    11,
+    12
+   ],
+   "gt_U": [],
+   "judge": {
+    "6": "no",
+    "7": "no",
+    "9": "no",
+    "10": "no",
+    "11": "yes",
+    "12": "yes",
+    "13": "no"
+   },
+   "flags": [
+    {
+     "code": "unmarked_relevant",
+     "ids": [],
+     "note": "grey snowboard behind left person, left of subject, unmarked"
+    },
+    {
+     "code": "other",
+     "ids": [
+      11,
+      12
+     ],
+     "note": "backpack masks look like strap fragments only"
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "n": 30,
+   "tid": "T08",
+   "split": "train",
+   "key": "000000444214",
+   "anchor": 10,
+   "gt_S": [
+    16,
+    17,
+    21,
+    24
+   ],
+   "gt_U": [],
+   "judge": {
+    "2": "no",
+    "3": "no",
+    "4": "no",
+    "6": "no",
+    "7": "no",
+    "9": "no",
+    "11": "no",
+    "12": "no",
+    "13": "no",
+    "14": "no",
+    "15": "no",
+    "16": "yes",
+    "17": "yes",
+    "18": "no",
+    "21": "yes",
+    "22": "no",
+    "24": "yes"
+   },
+   "flags": [
+    {
+     "code": "subject_bad",
+     "ids": [],
+     "note": "subject man looks grey-shirted; 'light blue shirt' fits man 9 (blue sleeves, vest) better"
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "n": 31,
+   "tid": "T08",
+   "split": "train",
+   "key": "000000419790",
+   "anchor": 10,
+   "gt_S": [
+    5,
+    9,
+    11,
+    12,
+    14
+   ],
+   "gt_U": [
+    7
+   ],
+   "judge": {
+    "5": "yes",
+    "7": "unclear",
+    "9": "yes",
+    "11": "yes",
+    "12": "yes",
+    "14": "yes",
+    "15": "no"
+   },
+   "flags": [],
+   "confidence": "medium"
+  },
+  {
+   "n": 32,
+   "tid": "T09",
+   "split": "train",
+   "key": "000000224164",
+   "anchor": 24,
+   "gt_S": [
+    15,
+    16,
+    18,
+    25
+   ],
+   "gt_U": [
+    6
+   ],
+   "judge": {
+    "6": "yes",
+    "7": "no",
+    "8": "no",
+    "9": "no",
+    "10": "no",
+    "14": "no",
+    "15": "yes",
+    "16": "yes",
+    "17": "no",
+    "18": "yes",
+    "19": "no",
+    "20": "no",
+    "21": "unclear",
+    "22": "unclear",
+    "23": "no",
+    "25": "yes",
+    "26": "no"
+   },
+   "flags": [
+    {
+     "code": "other",
+     "ids": [
+      17,
+      23
+     ],
+     "note": "touch subject, so excluded; 23 touch is borderline"
+    },
+    {
+     "code": "label_wrong",
+     "ids": [
+      19
+     ],
+     "note": "'microwave' looks like a stove/dishwasher (minor)"
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "n": 33,
+   "tid": "T09",
+   "split": "val",
+   "key": "000000578489",
+   "anchor": 14,
+   "gt_S": [
+    6,
+    7,
+    9,
+    15
+   ],
+   "gt_U": [],
+   "judge": {
+    "4": "unclear",
+    "5": "no",
+    "6": "yes",
+    "7": "yes",
+    "8": "no",
+    "9": "yes",
+    "10": "no",
+    "13": "no",
+    "15": "yes",
+    "16": "unclear"
+   },
+   "flags": [
+    {
+     "code": "subject_bad",
+     "ids": [],
+     "note": "subject mask is fragmentary baby held by man; pink-clothed standing child 15 also fits 'child in pink'"
+    },
+    {
+     "code": "mask_bad",
+     "ids": [],
+     "note": "subject outline split into pieces"
+    },
+    {
+     "code": "other",
+     "ids": [
+      4
+     ],
+     "note": "couch label sits on man's leg, unclear object"
+    }
+   ],
+   "confidence": "low"
+  },
+  {
+   "n": 34,
+   "tid": "T09",
+   "split": "train",
+   "key": "000000445099",
+   "anchor": 11,
+   "gt_S": [
+    6,
+    7
+   ],
+   "gt_U": [
+    5
+   ],
+   "judge": {
+    "5": "yes",
+    "6": "yes",
+    "7": "unclear",
+    "10": "no",
+    "12": "no"
+   },
+   "flags": [
+    {
+     "code": "occlusion_touch",
+     "ids": [
+      12
+     ],
+     "note": "child held in front of woman 12; border shared because child overlaps her"
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "n": 35,
+   "tid": "T09",
+   "split": "val",
+   "key": "000000227044",
+   "anchor": 7,
+   "gt_S": [],
+   "gt_U": [],
+   "judge": {
+    "6": "no",
+    "8": "no",
+    "9": "no",
+    "10": "no"
+   },
+   "flags": [
+    {
+     "code": "label_wrong",
+     "ids": [
+      8,
+      9,
+      10
+     ],
+     "note": "glass tumblers rather than bottles (minor)"
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "n": 36,
+   "tid": "T10",
+   "split": "train",
+   "key": "000000224164",
+   "anchor": 17,
+   "gt_S": [
+    10,
+    14,
+    23,
+    24,
+    25
+   ],
+   "gt_U": [],
+   "judge": {
+    "6": "no",
+    "7": "no",
+    "8": "no",
+    "9": "no",
+    "10": "unclear",
+    "14": "yes",
+    "15": "no",
+    "16": "no",
+    "18": "no",
+    "19": "no",
+    "20": "no",
+    "21": "no",
+    "22": "no",
+    "23": "yes",
+    "24": "yes",
+    "25": "unclear",
+    "26": "no"
+   },
+   "flags": [
+    {
+     "code": "other",
+     "ids": [],
+     "note": "unnumbered white outlines (plates, forks) near right with no label"
+    }
+   ],
+   "confidence": "low"
+  },
+  {
+   "n": 37,
+   "tid": "T10",
+   "split": "train",
+   "key": "000000217461",
+   "anchor": 3,
+   "gt_S": [
+    7
+   ],
+   "gt_U": [],
+   "judge": {
+    "4": "no",
+    "5": "no",
+    "6": "no",
+    "7": "yes"
+   },
+   "flags": [],
+   "confidence": "medium"
+  },
+  {
+   "n": 38,
+   "tid": "T10",
+   "split": "val",
+   "key": "000000399205",
+   "anchor": 15,
+   "gt_S": [
+    16
+   ],
+   "gt_U": [
+    14
+   ],
+   "judge": {
+    "12": "no",
+    "13": "no",
+    "14": "no",
+    "16": "yes",
+    "17": "no",
+    "18": "no",
+    "21": "no",
+    "26": "no",
+    "27": "no"
+   },
+   "flags": [
+    {
+     "code": "label_wrong",
+     "ids": [
+      21
+     ],
+     "note": "caption says maroon shirt/jeans but object 21 is man in olive polo; caption seems swapped with 14"
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "n": 39,
+   "tid": "T10",
+   "split": "train",
+   "key": "000000146570",
+   "anchor": 7,
+   "gt_S": [
+    10
+   ],
+   "gt_U": [],
+   "judge": {
+    "8": "no",
+    "9": "no",
+    "10": "yes",
+    "14": "no"
+   },
+   "flags": [
+    {
+     "code": "label_wrong",
+     "ids": [
+      9,
+      10
+     ],
+     "note": "horse statuettes/figurines"
+    },
+    {
+     "code": "unmarked_relevant",
+     "ids": [],
+     "note": "rug/floor, right-edge speaker, wall hanging touch edges but unmarked"
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "n": 40,
+   "tid": "T11",
+   "split": "train",
+   "key": "000000421315",
+   "anchor": 21,
+   "gt_S": [
+    19,
+    20,
+    22,
+    29,
+    30
+   ],
+   "gt_U": [
+    15,
+    52
+   ],
+   "judge": {
+    "10": "no",
+    "12": "no",
+    "13": "no",
+    "15": "unclear",
+    "19": "yes",
+    "20": "yes",
+    "22": "yes",
+    "23": "no",
+    "24": "no",
+    "25": "no",
+    "26": "no",
+    "27": "no",
+    "28": "no",
+    "29": "yes",
+    "30": "yes",
+    "31": "no",
+    "52": "unclear"
+   },
+   "flags": [
+    {
+     "code": "occlusion_touch",
+     "ids": [
+      15,
+      19,
+      20,
+      22,
+      29,
+      30
+     ],
+     "note": "woman stands in front of/behind these; contact is overlap"
+    },
+    {
+     "code": "other",
+     "ids": [
+      25,
+      26
+     ],
+     "note": "25 and 26 appear to be same man (duplicate masks?)"
+    },
+    {
+     "code": "other",
+     "ids": [
+      52
+     ],
+     "note": "label 52 sits on cake, unclear object"
+    }
+   ],
+   "confidence": "low"
+  },
+  {
+   "n": 41,
+   "tid": "T11",
+   "split": "train",
+   "key": "000000280083",
+   "anchor": 8,
+   "gt_S": [],
+   "gt_U": [
+    16
+   ],
+   "judge": {
+    "7": "no",
+    "9": "no",
+    "10": "no",
+    "11": "no",
+    "12": "no",
+    "13": "no",
+    "14": "no",
+    "16": "unclear",
+    "17": "no"
+   },
+   "flags": [
+    {
+     "code": "occlusion_touch",
+     "ids": [
+      9,
+      16
+     ],
+     "note": "girl and held fork are in front of chair"
+    },
+    {
+     "code": "other",
+     "ids": [
+      17
+     ],
+     "note": "table may meet chair edge but is larger"
+    }
+   ],
+   "confidence": "low"
+  },
+  {
+   "n": 42,
+   "tid": "T11",
+   "split": "train",
+   "key": "000000526522",
+   "anchor": 7,
+   "gt_S": [
+    4,
+    9
+   ],
+   "gt_U": [
+    6
+   ],
+   "judge": {
+    "2": "no",
+    "3": "no",
+    "4": "yes",
+    "5": "no",
+    "6": "no",
+    "8": "unclear",
+    "9": "unclear"
+   },
+   "flags": [
+    {
+     "code": "occlusion_touch",
+     "ids": [
+      4,
+      9
+     ],
+     "note": "cup held in front of him; couch is behind him, border by overlap"
+    },
+    {
+     "code": "other",
+     "ids": [
+      8,
+      9
+     ],
+     "note": "cake plate vs subject gap tiny; couch visible area vs subject area uncertain"
+    }
+   ],
+   "confidence": "low"
+  },
+  {
+   "n": 43,
+   "tid": "T11",
+   "split": "train",
+   "key": "000000331331",
+   "anchor": 3,
+   "gt_S": [
+    11
+   ],
+   "gt_U": [
+    7
+   ],
+   "judge": {
+    "4": "no",
+    "5": "no",
+    "6": "no",
+    "7": "no",
+    "8": "no",
+    "9": "no",
+    "10": "no",
+    "11": "yes",
+    "12": "no"
+   },
+   "flags": [
+    {
+     "code": "occlusion_touch",
+     "ids": [
+      6,
+      11
+     ],
+     "note": "finger/shoe overlap chair legs"
+    },
+    {
+     "code": "label_wrong",
+     "ids": [
+      12
+     ],
+     "note": "dark region labelled handbag looks like chair/background"
+    },
+    {
+     "code": "subject_bad",
+     "ids": [],
+     "note": "subject is only fragments of chair legs"
+    }
+   ],
+   "confidence": "low"
+  },
+  {
+   "n": 44,
+   "tid": "T12",
+   "split": "val",
+   "key": "000000302030",
+   "anchor": 22,
+   "gt_S": [],
+   "gt_U": [],
+   "judge": {
+    "8": "no",
+    "9": "no",
+    "11": "no",
+    "14": "no",
+    "15": "no",
+    "17": "no",
+    "21": "no",
+    "23": "no",
+    "24": "no",
+    "26": "no"
+   },
+   "flags": [
+    {
+     "code": "other",
+     "ids": [
+      9
+     ],
+     "note": "laptop contains the subject keyboard; part-whole, excluded as larger"
+    },
+    {
+     "code": "label_wrong",
+     "ids": [
+      21
+     ],
+     "note": "'laptop' looks like papers, not a laptop"
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "n": 45,
+   "tid": "T12",
+   "split": "train",
+   "key": "000000462129",
+   "anchor": 7,
+   "gt_S": [
+    8,
+    9
+   ],
+   "gt_U": [],
+   "judge": {
+    "6": "no",
+    "8": "unclear",
+    "9": "yes",
+    "10": "no",
+    "11": "no",
+    "12": "no",
+    "13": "no",
+    "14": "no",
+    "16": "no",
+    "17": "no",
+    "19": "no"
+   },
+   "flags": [
+    {
+     "code": "occlusion_touch",
+     "ids": [
+      12,
+      8,
+      9
+     ],
+     "note": "car behind woman, umbrella and bag overlap her"
+    },
+    {
+     "code": "other",
+     "ids": [
+      8
+     ],
+     "note": "umbrella vs woman area close"
+    }
+   ],
+   "confidence": "low"
+  },
+  {
+   "n": 46,
+   "tid": "T12",
+   "split": "val",
+   "key": "000000311303",
+   "anchor": 6,
+   "gt_S": [],
+   "gt_U": [],
+   "judge": {
+    "2": "no",
+    "3": "no",
+    "4": "no",
+    "5": "no",
+    "7": "no"
+   },
+   "flags": [
+    {
+     "code": "subject_bad",
+     "ids": [],
+     "note": "subject is just a cropped torso/scarf box at top-left edge, hardly an identifiable person"
+    },
+    {
+     "code": "occlusion_touch",
+     "ids": [
+      7
+     ],
+     "note": "table meets subject only because person hides it; excluded anyway (larger)"
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "n": 47,
+   "tid": "T12",
+   "split": "train",
+   "key": "000000113032",
+   "anchor": 15,
+   "gt_S": [
+    13,
+    17,
+    18
+   ],
+   "gt_U": [],
+   "judge": {
+    "9": "no",
+    "10": "no",
+    "11": "no",
+    "12": "no",
+    "13": "yes",
+    "16": "no",
+    "17": "yes",
+    "18": "unclear",
+    "19": "no",
+    "20": "no",
+    "21": "no",
+    "25": "no",
+    "26": "no"
+   },
+   "flags": [
+    {
+     "code": "occlusion_touch",
+     "ids": [
+      12,
+      17
+     ],
+     "note": "overlap in front of subject"
+    },
+    {
+     "code": "other",
+     "ids": [
+      13
+     ],
+     "note": "tie lies inside the subject body"
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "n": 48,
+   "tid": "T13",
+   "split": "val",
+   "key": "000000449661",
+   "anchor": 13,
+   "gt_S": [
+    8,
+    9,
+    10,
+    11
+   ],
+   "gt_U": [],
+   "judge": {
+    "8": "yes",
+    "9": "yes",
+    "10": "yes",
+    "11": "yes",
+    "12": "no"
+   },
+   "flags": [
+    {
+     "code": "subject_bad",
+     "ids": [],
+     "note": "subject bed is only a cropped fragment at right edge, outline looks split"
+    },
+    {
+     "code": "label_wrong",
+     "ids": [
+      10
+     ],
+     "note": "'television' mask looks like a small wall unit"
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "n": 49,
+   "tid": "T13",
+   "split": "train",
+   "key": "000000418988",
+   "anchor": 7,
+   "gt_S": [
+    16
+   ],
+   "gt_U": [],
+   "judge": {
+    "4": "no",
+    "5": "no",
+    "6": "no",
+    "8": "no",
+    "9": "no",
+    "11": "no",
+    "12": "no",
+    "13": "no",
+    "14": "no",
+    "15": "no",
+    "16": "yes",
+    "17": "no"
+   },
+   "flags": [],
+   "confidence": "high"
+  },
+  {
+   "n": 50,
+   "tid": "T13",
+   "split": "train",
+   "key": "000000508939",
+   "anchor": 13,
+   "gt_S": [
+    9,
+    10,
+    11,
+    16
+   ],
+   "gt_U": [],
+   "judge": {
+    "9": "yes",
+    "10": "yes",
+    "11": "yes",
+    "16": "yes",
+    "18": "no"
+   },
+   "flags": [
+    {
+     "code": "label_wrong",
+     "ids": [
+      18
+     ],
+     "note": "18 (traffic light) looks like a white sign/odd shape, not a traffic light; low confidence"
+    }
+   ],
+   "confidence": "low"
+  },
+  {
+   "n": 51,
+   "tid": "T13",
+   "split": "train",
+   "key": "000000171695",
+   "anchor": 9,
+   "gt_S": [
+    7,
+    14
+   ],
+   "gt_U": [],
+   "judge": {
+    "6": "no",
+    "7": "yes",
+    "8": "no",
+    "11": "no",
+    "12": "no",
+    "14": "yes",
+    "15": "no",
+    "16": "no",
+    "17": "no",
+    "18": "no",
+    "19": "no",
+    "21": "no",
+    "22": "no",
+    "23": "no",
+    "24": "no"
+   },
+   "flags": [
+    {
+     "code": "label_wrong",
+     "ids": [
+      6
+     ],
+     "note": "school bus labelled truck; would be selected if correct"
+    },
+    {
+     "code": "label_wrong",
+     "ids": [
+      14
+     ],
+     "note": "inflatable float labelled pizza"
+    },
+    {
+     "code": "subject_bad",
+     "ids": [],
+     "note": "magenta also extends over right-edge greenery"
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "n": 52,
+   "tid": "T14",
+   "split": "train",
+   "key": "000000330785",
+   "anchor": 7,
+   "gt_S": [
+    8,
+    10,
+    12,
+    14
+   ],
+   "gt_U": [
+    4
+   ],
+   "judge": {
+    "2": "no",
+    "3": "no",
+    "4": "no",
+    "5": "no",
+    "6": "no",
+    "8": "yes",
+    "9": "no",
+    "10": "yes",
+    "11": "no",
+    "12": "yes",
+    "13": "no",
+    "14": "yes",
+    "15": "no",
+    "16": "no"
+   },
+   "flags": [
+    {
+     "code": "occlusion_touch",
+     "ids": [
+      8,
+      10,
+      12,
+      14
+     ],
+     "note": "stacked plush overlap"
+    },
+    {
+     "code": "label_wrong",
+     "ids": [
+      13
+     ],
+     "note": "panda plush labelled cat"
+    },
+    {
+     "code": "mask_bad",
+     "ids": [
+      10
+     ],
+     "note": "brown bear head sits in a hole of the subject outline and is not in 10's outline"
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "n": 53,
+   "tid": "T14",
+   "split": "train",
+   "key": "000000270202",
+   "anchor": 8,
+   "gt_S": [
+    24
+   ],
+   "gt_U": [
+    18,
+    20,
+    23
+   ],
+   "judge": {
+    "4": "no",
+    "5": "no",
+    "6": "no",
+    "11": "no",
+    "12": "no",
+    "13": "no",
+    "14": "no",
+    "15": "no",
+    "16": "no",
+    "17": "no",
+    "18": "unclear",
+    "19": "no",
+    "20": "unclear",
+    "23": "no",
+    "24": "yes"
+   },
+   "flags": [
+    {
+     "code": "other",
+     "ids": [
+      18,
+      20
+     ],
+     "note": "gap to cake marginal"
+    }
+   ],
+   "confidence": "low"
+  },
+  {
+   "n": 54,
+   "tid": "T14",
+   "split": "train",
+   "key": "000000184613",
+   "anchor": 6,
+   "gt_S": [
+    7,
+    22
+   ],
+   "gt_U": [],
+   "judge": {
+    "7": "yes",
+    "8": "no",
+    "9": "no",
+    "10": "no",
+    "11": "no",
+    "13": "no",
+    "22": "yes",
+    "23": "no",
+    "24": "no",
+    "25": "no",
+    "26": "no",
+    "27": "no",
+    "32": "no",
+    "33": "no"
+   },
+   "flags": [
+    {
+     "code": "occlusion_touch",
+     "ids": [
+      7
+     ],
+     "note": "cow 7 is behind subject; meets its outline via overlap"
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "n": 55,
+   "tid": "T14",
+   "split": "train",
+   "key": "000000277799",
+   "anchor": 4,
+   "gt_S": [
+    5,
+    6,
+    13,
+    18
+   ],
+   "gt_U": [
+    12
+   ],
+   "judge": {
+    "3": "no",
+    "5": "yes",
+    "6": "yes",
+    "7": "no",
+    "8": "no",
+    "9": "no",
+    "10": "no",
+    "11": "no",
+    "12": "yes",
+    "13": "yes",
+    "14": "no",
+    "15": "no",
+    "16": "no",
+    "17": "no",
+    "18": "yes"
+   },
+   "flags": [
+    {
+     "code": "occlusion_touch",
+     "ids": [
+      5,
+      6,
+      12
+     ],
+     "note": "people sit/stand in front of bleacher"
+    },
+    {
+     "code": "subject_bad",
+     "ids": [],
+     "note": "bleacher mask is fragmented"
+    }
+   ],
+   "confidence": "low"
+  },
+  {
+   "n": 56,
+   "tid": "T15",
+   "split": "train",
+   "key": "000000100753",
+   "anchor": 17,
+   "gt_S": [
+    5,
+    6,
+    9
+   ],
+   "gt_U": [],
+   "judge": {
+    "4": "no",
+    "7": "no",
+    "8": "no",
+    "10": "no",
+    "16": "no",
+    "5": "yes",
+    "6": "yes",
+    "9": "unclear",
+    "12": "unclear"
+   },
+   "flags": [
+    {
+     "code": "mask_bad",
+     "ids": [
+      12
+     ],
+     "note": "carrot ringed in magenta inside the plate, subject mask artifact"
+    },
+    {
+     "code": "other",
+     "ids": [],
+     "note": "subject table mask has holes for plates"
+    }
+   ],
+   "confidence": "low"
+  },
+  {
+   "n": 57,
+   "tid": "T15",
+   "split": "val",
+   "key": "000000566923",
+   "anchor": 8,
+   "gt_S": [],
+   "gt_U": [],
+   "judge": {
+    "7": "no",
+    "9": "no",
+    "10": "no",
+    "11": "no",
+    "12": "no",
+    "13": "no",
+    "14": "no",
+    "15": "no",
+    "16": "no",
+    "17": "no",
+    "18": "no",
+    "19": "no"
+   },
+   "flags": [
+    {
+     "code": "unmarked_relevant",
+     "ids": [],
+     "note": "panda backpack on person 11 touching subject, unmarked"
+    },
+    {
+     "code": "other",
+     "ids": [
+      15
+     ],
+     "note": "handbag outline is a thin sliver, label dubious"
+    },
+    {
+     "code": "other",
+     "ids": [
+      7
+     ],
+     "note": "hydrant touches subject but reaches bottom edge so excluded; answer set ends up empty"
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "n": 58,
+   "tid": "T15",
+   "split": "val",
+   "key": "000000436738",
+   "anchor": 10,
+   "gt_S": [
+    8,
+    11,
+    17
+   ],
+   "gt_U": [
+    14
+   ],
+   "judge": {
+    "8": "unclear",
+    "9": "no",
+    "11": "yes",
+    "14": "unclear",
+    "15": "no",
+    "17": "yes"
+   },
+   "flags": [
+    {
+     "code": "occlusion_touch",
+     "ids": [
+      17,
+      11
+     ],
+     "note": "car 17 is in front of the bus; truck 11 behind/adjacent to bus end"
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "n": 59,
+   "tid": "T15",
+   "split": "train",
+   "key": "000000008063",
+   "anchor": 11,
+   "gt_S": [
+    10,
+    12
+   ],
+   "gt_U": [],
+   "judge": {
+    "4": "no",
+    "5": "no",
+    "6": "no",
+    "7": "no",
+    "8": "no",
+    "9": "no",
+    "10": "no",
+    "12": "yes",
+    "14": "no",
+    "15": "no",
+    "16": "no",
+    "17": "no",
+    "19": "no",
+    "20": "no",
+    "21": "no",
+    "22": "no",
+    "23": "no",
+    "26": "no",
+    "28": "no",
+    "30": "no"
+   },
+   "flags": [],
+   "confidence": "medium"
+  },
+  {
+   "n": 60,
+   "tid": "T16",
+   "split": "train",
+   "key": "000000176084",
+   "anchor": 14,
+   "gt_S": [
+    7,
+    8,
+    9,
+    10
+   ],
+   "gt_U": [],
+   "judge": {
+    "7": "unclear",
+    "8": "yes",
+    "9": "yes",
+    "10": "yes"
+   },
+   "flags": [
+    {
+     "code": "occlusion_touch",
+     "ids": [
+      8
+     ],
+     "note": "couch is behind the man"
+    },
+    {
+     "code": "subject_bad",
+     "ids": [],
+     "note": "subject is only jeans/legs at bottom left, partly cropped"
+    }
+   ],
+   "confidence": "low"
+  },
+  {
+   "n": 61,
+   "tid": "T16",
+   "split": "val",
+   "key": "000000278705",
+   "anchor": 12,
+   "gt_S": [
+    7,
+    11
+   ],
+   "gt_U": [],
+   "judge": {
+    "7": "yes",
+    "9": "no",
+    "10": "yes",
+    "11": "yes"
+   },
+   "flags": [
+    {
+     "code": "occlusion_touch",
+     "ids": [
+      7,
+      10
+     ],
+     "note": "people in front of cars"
+    },
+    {
+     "code": "other",
+     "ids": [],
+     "note": "subject car mask fragmented by poles/ropes; second skateboard unmarked"
+    }
+   ],
+   "confidence": "medium"
+  },
+  {
+   "n": 62,
+   "tid": "T16",
+   "split": "train",
+   "key": "000000030431",
+   "anchor": 5,
+   "gt_S": [
+    3,
+    4,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11
+   ],
+   "gt_U": [],
+   "judge": {
+    "3": "yes",
+    "4": "yes",
+    "6": "yes",
+    "7": "yes",
+    "8": "yes",
+    "9": "yes",
+    "10": "yes",
+    "11": "yes"
+   },
+   "flags": [],
+   "confidence": "high"
+  },
+  {
+   "n": 63,
+   "tid": "T16",
+   "split": "train",
+   "key": "000000106660",
+   "anchor": 6,
+   "gt_S": [
+    7,
+    8
+   ],
+   "gt_U": [
+    9
+   ],
+   "judge": {
+    "5": "unclear",
+    "7": "yes",
+    "8": "yes",
+    "9": "unclear"
+   },
+   "flags": [
+    {
+     "code": "label_wrong",
+     "ids": [
+      7,
+      8
+     ],
+     "note": "small blue glass bottles rather than vases"
+    },
+    {
+     "code": "other",
+     "ids": [
+      5,
+      9
+     ],
+     "note": "plants touch subject vase; selected only if subject counts as same-kind"
+    }
+   ],
+   "confidence": "low"
+  }
+ ]
+}

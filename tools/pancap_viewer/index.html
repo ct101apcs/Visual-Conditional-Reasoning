@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PanCap Viewer</title>
+<style>
+:root {
+  --bg: #f6f6f4; --panel: #ffffff; --line: #e2e2dc; --text: #1d1d1b; --muted: #6b6b66;
+  --accent: #2f6fde; --err: #c8372d; --warn: #b7791f; --info: #5a6b80; --ok: #2f8a4c;
+  --chip: #f0f0ec; --sel: #e8effc;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #151514; --panel: #1e1e1c; --line: #33332f; --text: #e8e8e3; --muted: #9a9a93;
+          --accent: #6b9bf0; --err: #ef6a5f; --warn: #e2a64a; --info: #8ea0b8; --ok: #5cbf7a;
+          --chip: #2a2a27; --sel: #23324d; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { background: var(--bg); color: var(--text); font: 13px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif;
+       display: grid; grid-template-columns: 260px 1fr 420px; height: 100vh; overflow: hidden; }
+aside, section { overflow: hidden; display: flex; flex-direction: column; min-height: 0; }
+#left { border-right: 1px solid var(--line); background: var(--panel); }
+#right { border-left: 1px solid var(--line); background: var(--panel); }
+.pad { padding: 10px 12px; }
+h1 { font-size: 14px; margin: 0 0 8px; letter-spacing: .02em; }
+h2 { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 14px 0 6px; font-weight: 600; }
+select, input[type=text] { width: 100%; padding: 5px 7px; border: 1px solid var(--line); border-radius: 6px;
+                           background: var(--bg); color: var(--text); font: inherit; margin-bottom: 6px; }
+.row { display: flex; gap: 6px; align-items: center; }
+.row > * { flex: 1; }
+#list { flex: 1; overflow-y: auto; border-top: 1px solid var(--line); }
+.item { padding: 4px 12px; cursor: pointer; display: flex; gap: 8px; align-items: center; font-family: ui-monospace, monospace; font-size: 12px; }
+.item:hover { background: var(--chip); }
+.item.sel { background: var(--sel); }
+.dot { width: 8px; height: 8px; border-radius: 50%; flex: none; background: var(--line); }
+.dot.ok { background: var(--ok); } .dot.warn { background: var(--warn); } .dot.error { background: var(--err); }
+#pager { display: flex; justify-content: space-between; align-items: center; padding: 6px 12px; border-top: 1px solid var(--line); color: var(--muted); }
+button { font: inherit; padding: 3px 9px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); color: var(--text); cursor: pointer; }
+button:hover { border-color: var(--accent); }
+#summary { color: var(--muted); font-size: 12px; }
+#toolbar { display: flex; gap: 14px; align-items: center; padding: 8px 14px; border-bottom: 1px solid var(--line); background: var(--panel); flex-wrap: wrap; }
+#toolbar label { display: flex; gap: 5px; align-items: center; color: var(--muted); }
+#title { font-family: ui-monospace, monospace; font-weight: 600; color: var(--text); }
+#stage { flex: 1; overflow: auto; display: flex; align-items: flex-start; justify-content: center; padding: 14px; position: relative; }
+#canvasWrap { position: relative; line-height: 0; box-shadow: 0 1px 6px rgba(0,0,0,.15); }
+#canvasWrap canvas { max-width: 100%; }
+#cv { image-rendering: auto; }
+#tip { position: fixed; pointer-events: none; background: rgba(20,20,20,.9); color: #fff; padding: 4px 8px; border-radius: 5px; font-size: 12px; display: none; z-index: 9; white-space: nowrap; }
+#msg { color: var(--warn); font-size: 12px; margin-right: auto; }
+#issues .iss { padding: 5px 8px; border-left: 3px solid; margin-bottom: 4px; background: var(--chip); border-radius: 0 5px 5px 0; }
+.iss.error { border-color: var(--err); } .iss.warn { border-color: var(--warn); } .iss.info { border-color: var(--info); }
+.iss b { font-family: ui-monospace, monospace; font-size: 11px; }
+#rightScroll { overflow-y: auto; flex: 1; }
+#caption { line-height: 1.75; font-size: 13.5px; }
+.tag { border-radius: 4px; padding: 1px 4px; cursor: pointer; border: 1.5px solid; white-space: normal; }
+.tag sup { font-family: ui-monospace, monospace; font-size: 10px; font-weight: 700; margin-right: 3px; }
+.tag.bad { border-style: dashed; border-color: var(--err) !important; }
+.tag.fmt-xml, .tag.fmt-bare { border-style: dotted; }
+.tag.fmt-malformed { border-color: var(--err); background: transparent; color: var(--err); }
+.tag.hl { outline: 2px solid var(--text); }
+table { width: 100%; border-collapse: collapse; font-size: 12px; }
+td, th { padding: 3px 5px; text-align: left; border-bottom: 1px solid var(--line); }
+th { color: var(--muted); font-weight: 500; }
+tr.seg { cursor: pointer; } tr.seg:hover, tr.seg.hl { background: var(--sel); }
+.sw { display: inline-block; width: 11px; height: 11px; border-radius: 3px; vertical-align: -1px; }
+.num { text-align: right; font-variant-numeric: tabular-nums; }
+.muted { color: var(--muted); }
+kbd { font-family: ui-monospace, monospace; font-size: 11px; border: 1px solid var(--line); border-radius: 4px; padding: 0 4px; }
+</style>
+</head>
+<body>
+<aside id="left">
+  <div class="pad">
+    <h1>COCONut-PanCap viewer</h1>
+    <select id="split"></select>
+    <div class="row">
+      <select id="status"><option value="">any status</option><option value="error">error</option><option value="warn">warn</option><option value="ok">ok</option></select>
+    </div>
+    <select id="code"><option value="">any issue</option></select>
+    <input id="q" type="text" placeholder="filter by image id…">
+    <div id="summary"></div>
+  </div>
+  <div id="list"></div>
+  <div id="pager"><button id="prevPage">‹</button><span id="pageInfo"></span><button id="nextPage">›</button></div>
+</aside>
+
+<section>
+  <div id="toolbar">
+    <span id="title">—</span><span id="msg"></span>
+    <label>overlay <select id="mode" style="width:auto;margin:0"><option value="fill">fill</option><option value="contour">contours</option><option value="mask">mask only</option><option value="none">image only</option></select></label>
+    <label>opacity <input id="alpha" type="range" min="0" max="100" value="50"></label>
+    <label><input id="onlyRef" type="checkbox"> referenced only</label>
+    <span class="muted"><kbd>←</kbd><kbd>→</kbd> prev/next · <kbd>o</kbd> overlay</span>
+  </div>
+  <div id="stage">
+    <div id="canvasWrap"><canvas id="cv"></canvas></div>
+  </div>
+</section>
+
+<aside id="right">
+  <div id="rightScroll" class="pad">
+    <h2>Checks</h2>
+    <div id="issues"></div>
+    <h2>Caption</h2>
+    <div id="caption"></div>
+    <h2>Segments <span id="segCount" class="muted"></span></h2>
+    <table><thead><tr><th></th><th>id</th><th>category</th><th class="num">pixels</th><th>in caption</th></tr></thead><tbody id="segs"></tbody></table>
+    <h2>Metadata</h2>
+    <div id="meta" class="muted" style="font-family:ui-monospace,monospace;font-size:11px;white-space:pre-wrap"></div>
+  </div>
+</aside>
+<div id="tip"></div>
+
+<script>
+const $ = s => document.querySelector(s);
+const st = { splits: [], split: null, offset: 0, limit: 200, total: 0, items: [], key: null,
+             sample: null, ids: null, w: 0, h: 0, img: null, hover: new Set(), pinned: new Set() };
+const enc = encodeURIComponent;
+
+// golden-angle hues give neighbouring segment ids clearly different colours
+function segColor(id) { return id === 0 ? [0,0,0] : hsl2rgb((id * 137.508) % 360, 0.72, 0.52); }
+function hsl2rgb(h, s, l) {
+  const k = n => (n + h / 30) % 12, a = s * Math.min(l, 1 - l);
+  const f = n => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+  return [f(0), f(8), f(4)].map(v => Math.round(v * 255));
+}
+const css = c => `rgb(${c[0]},${c[1]},${c[2]})`;
+
+async function init() {
+  st.splits = await (await fetch('/api/splits')).json();
+  $('#split').innerHTML = st.splits.map(s => `<option value="${s.name}">${s.name} (${s.count})${s.verified ? '' : ' – not verified'}</option>`).join('');
+  const params = new URLSearchParams(location.hash.slice(1));
+  if (params.get('split')) $('#split').value = params.get('split');
+  await selectSplit(params.get('key'));
+}
+
+async function selectSplit(key) {
+  st.split = st.splits.find(s => s.name === $('#split').value);
+  $('#code').innerHTML = '<option value="">any issue</option>' + st.split.codes.map(c => `<option>${c}</option>`).join('');
+  const sm = st.split.summary;
+  $('#summary').innerHTML = sm ? Object.entries(sm).map(([k, v]) => `<span class="dot ${k}" style="display:inline-block"></span> ${k} ${v}`).join(' &nbsp; ')
+                               : 'Run <code>verify.py --split ' + st.split.name + '</code> to enable status filters.';
+  st.offset = 0;
+  await loadList();
+  if (key) openSample(key); else if (st.items.length) openSample(st.items[0].key);
+}
+
+async function loadList() {
+  const p = new URLSearchParams({ split: st.split.name, offset: st.offset, limit: st.limit, status: $('#status').value, code: $('#code').value, q: $('#q').value });
+  const r = await (await fetch('/api/list?' + p)).json();
+  st.total = r.total; st.items = r.items;
+  $('#list').innerHTML = r.items.map(it => `<div class="item${it.key === st.key ? ' sel' : ''}" data-key="${it.key}"><span class="dot ${it.status || ''}"></span>${it.key}</div>`).join('');
+  $('#pageInfo').textContent = r.total ? `${st.offset + 1}–${Math.min(st.offset + st.limit, r.total)} of ${r.total}` : 'no matches';
+}
+
+async function openSample(key) {
+  st.key = key; st.pinned.clear(); st.hover.clear();
+  document.querySelectorAll('.item').forEach(e => e.classList.toggle('sel', e.dataset.key === key));
+  history.replaceState(null, '', `#split=${st.split.name}&key=${enc(key)}`);
+  $('#title').textContent = `${st.split.name} / ${key}`;
+  $('#msg').textContent = 'loading…';
+  const split = st.split.name;
+  const [sample, maskBuf] = await Promise.all([
+    fetch(`/api/sample?split=${split}&key=${enc(key)}`).then(r => r.json()),
+    fetch(`/mask/${split}/${enc(key)}`).then(async r => r.ok ? { buf: await r.arrayBuffer(), w: +r.headers.get('X-Width'), h: +r.headers.get('X-Height') } : null),
+  ]);
+  if (st.key !== key) return;
+  st.sample = sample;
+  if (maskBuf) { st.ids = new Uint16Array(maskBuf.buf); st.w = maskBuf.w; st.h = maskBuf.h; }
+  else { st.ids = null; st.w = sample.meta.width || 640; st.h = sample.meta.height || 480; }
+  renderPanel();
+  st.img = null; draw();
+  $('#msg').textContent = sample.image_hw ? '' : 'fetching image…';
+  const img = new Image();
+  img.onload = () => { if (st.key === key) { st.img = img; $('#msg').textContent = ''; draw(); } };
+  img.onerror = () => { if (st.key === key) $('#msg').textContent = 'image unavailable – showing mask only'; };
+  img.src = `/image/${split}/${enc(key)}`;
+  const next = st.items[st.items.findIndex(i => i.key === key) + 1];
+  if (next) new Image().src = `/image/${split}/${enc(next.key)}`;  // prefetch so on-demand downloads overlap
+}
+
+function renderPanel() {
+  const s = st.sample;
+  $('#issues').innerHTML = s.issues.length ? s.issues.map(i => `<div class="iss ${i.level}"><b>${i.code}</b><br>${esc(i.msg)}</div>`).join('')
+                                           : '<div class="iss info" style="border-color:var(--ok)">All checks passed</div>';
+  const known = new Set(s.segments.map(x => x.id));
+  $('#caption').innerHTML = s.caption === null ? '<span class="muted">no caption</span>' : s.tokens.map(t => {
+    if (t.type === 'text') return esc(t.text);
+    const bad = t.ids.some(i => !known.has(i));
+    const c = t.ids.length ? segColor(t.ids[0]) : [128,128,128];
+    const style = t.fmt === 'malformed' ? '' : `border-color:${css(c)};background:rgba(${c},.14)`;
+    const shown = t.ids.length > 6 ? t.ids.slice(0, 6).join(',') + `…+${t.ids.length - 6}` : t.ids.join(',');
+    const label = t.ids.length ? `<sup>${shown}</sup>` : '<sup>?</sup>';
+    return `<span class="tag fmt-${t.fmt}${bad ? ' bad' : ''}" data-ids="${t.ids.join(',')}" style="${style}" title="${esc(t.raw)}">${label}${esc(t.text || '(no text)')}</span>`;
+  }).join('');
+  $('#segCount').textContent = `(${s.segments.length}, ${s.segments.filter(x => x.referenced).length} referenced)`;
+  $('#segs').innerHTML = s.segments.map(x => `<tr class="seg" data-ids="${x.id}"><td><span class="sw" style="background:${css(segColor(x.id))}"></span></td><td>${x.id}</td><td>${esc(x.category)}${x.isthing ? '' : ' <span class="muted">(stuff)</span>'}</td><td class="num">${x.pixels ?? '–'}</td><td>${x.referenced ? '✓' : '<span class="muted">–</span>'}</td></tr>`).join('');
+  $('#meta').textContent = JSON.stringify({ ...s.meta, mask_hw: s.mask_hw, image_hw: s.image_hw }, null, 1);
+}
+
+function esc(t) { return String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+
+function draw() {
+  const cv = $('#cv'), ctx = cv.getContext('2d', { willReadFrequently: true });
+  cv.width = st.w; cv.height = st.h;
+  const mode = $('#mode').value, alpha = $('#alpha').value / 100;
+  if (st.img && mode !== 'mask') ctx.drawImage(st.img, 0, 0, st.w, st.h);
+  else { ctx.fillStyle = '#777'; ctx.fillRect(0, 0, st.w, st.h); }
+  if (!st.ids || mode === 'none') return;
+  const focus = st.hover.size ? st.hover : st.pinned;
+  const refd = new Set(st.sample.segments.filter(x => x.referenced).map(x => x.id));
+  const onlyRef = $('#onlyRef').checked;
+  const out = ctx.getImageData(0, 0, st.w, st.h), d = out.data, ids = st.ids, W = st.w;
+  const lut = new Map();
+  for (let p = 0; p < ids.length; p++) {
+    const id = ids[p];
+    if (id === 0 || (onlyRef && !refd.has(id))) continue;
+    const isFocus = focus.has(id);
+    if (focus.size && !isFocus) { if (mode !== 'mask') { const o = p * 4; d[o] *= .45; d[o+1] *= .45; d[o+2] *= .45; } continue; }
+    let c = lut.get(id); if (!c) { c = segColor(id); lut.set(id, c); }
+    const o = p * 4;
+    if (mode === 'contour') {
+      const x = p % W;
+      const edge = (x + 1 < W && ids[p + 1] !== id) || (x > 0 && ids[p - 1] !== id) || ids[p + W] !== id || ids[p - W] !== id;
+      if (!edge && !isFocus) continue;
+      const a = edge ? 1 : alpha * .6;
+      d[o] = d[o] * (1 - a) + c[0] * a; d[o+1] = d[o+1] * (1 - a) + c[1] * a; d[o+2] = d[o+2] * (1 - a) + c[2] * a;
+    } else {
+      const a = mode === 'mask' ? 1 : (isFocus ? Math.max(alpha, .65) : alpha);
+      d[o] = d[o] * (1 - a) + c[0] * a; d[o+1] = d[o+1] * (1 - a) + c[1] * a; d[o+2] = d[o+2] * (1 - a) + c[2] * a;
+    }
+  }
+  ctx.putImageData(out, 0, 0);
+}
+
+function setHover(ids) {
+  st.hover = new Set(ids);
+  document.querySelectorAll('.tag, tr.seg').forEach(e => {
+    const eids = e.dataset.ids ? e.dataset.ids.split(',').map(Number) : [];
+    e.classList.toggle('hl', eids.some(i => st.hover.has(i) || (!st.hover.size && st.pinned.has(i))));
+  });
+  draw();
+}
+const idsOf = e => e.dataset.ids ? e.dataset.ids.split(',').filter(Boolean).map(Number) : [];
+
+for (const sel of ['#caption', '#segs']) {
+  $(sel).addEventListener('mouseover', e => { const t = e.target.closest('[data-ids]'); if (t) setHover(idsOf(t)); });
+  $(sel).addEventListener('mouseleave', () => setHover([]));
+  $(sel).addEventListener('click', e => {
+    const t = e.target.closest('[data-ids]'); if (!t) return;
+    const ids = idsOf(t), same = ids.length === st.pinned.size && ids.every(i => st.pinned.has(i));
+    st.pinned = same ? new Set() : new Set(ids); setHover([]);
+  });
+}
+
+$('#cv').addEventListener('mousemove', e => {
+  if (!st.ids) return;
+  const r = e.target.getBoundingClientRect();
+  const x = Math.floor((e.clientX - r.left) * st.w / r.width), y = Math.floor((e.clientY - r.top) * st.h / r.height);
+  const id = st.ids[y * st.w + x], seg = st.sample.segments.find(s => s.id === id);
+  const tip = $('#tip');
+  if (!id) { tip.style.display = 'none'; return; }
+  const tags = st.sample.tokens.filter(t => t.type === 'tag' && t.ids.includes(id)).map(t => t.text).filter(Boolean);
+  tip.innerHTML = `<b>${id}</b> · ${esc(seg ? seg.category : 'NOT IN segments_info')}` + (tags.length ? `<br>“${esc(tags[0].slice(0, 70))}”` : '<br><i>not mentioned in caption</i>');
+  tip.style.display = 'block'; tip.style.left = e.clientX + 14 + 'px'; tip.style.top = e.clientY + 12 + 'px';
+  if (!st.hover.has(id) || st.hover.size !== 1) setHover([id]);
+});
+$('#cv').addEventListener('mouseleave', () => { $('#tip').style.display = 'none'; setHover([]); });
+
+$('#list').addEventListener('click', e => { const t = e.target.closest('.item'); if (t) openSample(t.dataset.key); });
+$('#split').addEventListener('change', () => selectSplit());
+for (const id of ['#status', '#code']) $(id).addEventListener('change', () => { st.offset = 0; loadList(); });
+let qTimer; $('#q').addEventListener('input', () => { clearTimeout(qTimer); qTimer = setTimeout(() => { st.offset = 0; loadList(); }, 250); });
+$('#prevPage').onclick = () => { if (st.offset > 0) { st.offset -= st.limit; loadList(); } };
+$('#nextPage').onclick = () => { if (st.offset + st.limit < st.total) { st.offset += st.limit; loadList(); } };
+for (const id of ['#mode', '#alpha', '#onlyRef']) $(id).addEventListener('input', draw);
+
+document.addEventListener('keydown', async e => {
+  if (e.target.tagName === 'INPUT' && e.target.type === 'text') return;
+  if (e.key === 'o') { const m = $('#mode'); m.selectedIndex = (m.selectedIndex + 1) % m.options.length; draw(); }
+  if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+  e.preventDefault();
+  let i = st.items.findIndex(it => it.key === st.key) + (e.key === 'ArrowRight' ? 1 : -1);
+  if (i >= st.items.length && st.offset + st.limit < st.total) { st.offset += st.limit; await loadList(); i = 0; }
+  else if (i < 0 && st.offset > 0) { st.offset -= st.limit; await loadList(); i = st.items.length - 1; }
+  if (st.items[i]) { openSample(st.items[i].key); document.querySelector(`.item[data-key="${st.items[i].key}"]`)?.scrollIntoView({ block: 'nearest' }); }
+});
+
+init();
+</script>
+</body>
+</html>

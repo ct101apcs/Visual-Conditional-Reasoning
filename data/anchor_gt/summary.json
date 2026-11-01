@@ -1,0 +1,2036 @@
+{
+ "generated": "2026-10-29 17:03",
+ "thresholds": {
+  "SUBJ_MIN": 0.02,
+  "SUBJ_MAX": 0.6,
+  "CAND_MIN": 0.002,
+  "MIN_CANDS": 4,
+  "MAX_CANDS": 20,
+  "SIZE_MARGIN": 1.5,
+  "TOUCH_PX": 1.5,
+  "FAR_FRAC": 0.02,
+  "POS_MARGIN": 0.02,
+  "BORDER_PX": 1,
+  "BORDER_FRAC": 0.01,
+  "U_DROP": 0.3
+ },
+ "stages": [
+  {
+   "id": "thing",
+   "desc": "thing segment, not iscrowd, non-empty mask"
+  },
+  {
+   "id": "size",
+   "desc": "covers 2%\u201360% of the image"
+  },
+  {
+   "id": "phrase_unique",
+   "desc": "cited by a single-id caption tag whose phrase refers to no other segment"
+  },
+  {
+   "id": "not_group",
+   "desc": "phrase does not describe a group/plural or a reflection"
+  },
+  {
+   "id": "not_mismatch",
+   "desc": "phrase does not name only a different COCO category (mis-tag)"
+  },
+  {
+   "id": "clutter",
+   "desc": "4\u201320 marked candidates (things \u22650.2% of the image)"
+  },
+  {
+   "id": "rule_kept",
+   "desc": "\u22651 rule template keeps \u226430% of candidates in the ignore band"
+  }
+ ],
+ "funnel": {
+  "val": {
+   "images": {
+    "all": 5000,
+    "verify_ok": 4324,
+    "thing": 4307,
+    "size": 3751,
+    "phrase_unique": 3028,
+    "not_group": 3014,
+    "not_mismatch": 2998,
+    "clutter": 1142,
+    "rule_kept": 1142
+   },
+   "anchors": {
+    "thing": 39301,
+    "size": 9642,
+    "phrase_unique": 5351,
+    "not_group": 5287,
+    "not_mismatch": 5219,
+    "clutter": 2409,
+    "rule_kept": 2409
+   },
+   "rejected_at": {
+    "size": 29659,
+    "thing": 2004,
+    "clutter": 2810,
+    "phrase_unique": 4291,
+    "not_group": 64,
+    "not_mismatch": 68
+   },
+   "seconds": 12
+  },
+  "train": {
+   "images": {
+    "all": 118200,
+    "verify_ok": 110661,
+    "thing": 109594,
+    "size": 95314,
+    "phrase_unique": 75687,
+    "not_group": 75214,
+    "not_mismatch": 74889,
+    "clutter": 26994,
+    "rule_kept": 26994
+   },
+   "anchors": {
+    "thing": 912519,
+    "size": 235598,
+    "phrase_unique": 133061,
+    "not_group": 131513,
+    "not_mismatch": 130320,
+    "clutter": 58321,
+    "rule_kept": 58321
+   },
+   "rejected_at": {
+    "phrase_unique": 102537,
+    "clutter": 71999,
+    "size": 676921,
+    "not_group": 1548,
+    "thing": 51874,
+    "not_mismatch": 1193
+   },
+   "seconds": 277
+  }
+ },
+ "predicates": {
+  "same_cat": "is the same kind of object as {S} (for example, both are cars)",
+  "larger": "covers more image pixels than {S}",
+  "smaller": "covers fewer image pixels than {S}",
+  "touch": "has a visible outline that shares a border with the outline of {S} in the image (overlapping in the picture counts, even with no physical contact)",
+  "left": "has its centre to the left of the leftmost visible point of {S}",
+  "above": "has its centre above the topmost visible point of {S}",
+  "border": "reaches the edge of the image",
+  "contact": "is physically touching {S}: resting on it, leaning on it, or held, worn, carried or ridden by it, or the reverse"
+ },
+ "modalities": {
+  "text": "M-text: the subject is named by its caption phrase and carries no mark",
+  "contour": "M-contour: the subject is outlined in magenta and carries no number",
+  "mark": "M-mark: the subject carries a number like every other object"
+ },
+ "templates": [
+  {
+   "id": "T01",
+   "level": "L1",
+   "name": "touch",
+   "prims": [
+    "touch"
+   ],
+   "wording": "none",
+   "text": [
+    "Select every marked object whose visible outline shares a border with the outline of {S} in the image.",
+    "Which marked objects border {S}? An object borders {S} when its visible outline shares a border with the outline of {S} in the image.",
+    "List the marked objects that share a border with {S}, meaning their visible outline and the outline of {S} meet in the image."
+   ],
+   "neg": [],
+   "exc": [],
+   "probe": [
+    "touch"
+   ],
+   "components": [
+    "touch"
+   ],
+   "has_opp": false
+  },
+  {
+   "id": "T02",
+   "level": "L1",
+   "name": "larger",
+   "prims": [
+    "larger"
+   ],
+   "wording": "none",
+   "text": [
+    "Select every marked object that covers more image pixels than {S}.",
+    "Which marked objects are larger than {S}? Here larger means the object covers more image pixels than {S}, not that it is bigger in real life.",
+    "List the marked objects whose visible area in the image, counted in pixels, is greater than that of {S}."
+   ],
+   "neg": [],
+   "exc": [],
+   "probe": [
+    "larger"
+   ],
+   "components": [
+    "size"
+   ],
+   "has_opp": false
+  },
+  {
+   "id": "T03",
+   "level": "L1",
+   "name": "left",
+   "prims": [
+    "left"
+   ],
+   "wording": "none",
+   "text": [
+    "Select every marked object whose centre lies to the left of the leftmost visible point of {S}.",
+    "Which marked objects are left of {S}? An object is left of {S} when its centre lies to the left of the leftmost visible point of {S} in the image.",
+    "List the marked objects whose centre is further left in the image than the leftmost visible point of {S}."
+   ],
+   "neg": [],
+   "exc": [],
+   "probe": [
+    "left"
+   ],
+   "components": [
+    "left"
+   ],
+   "has_opp": false
+  },
+  {
+   "id": "T04",
+   "level": "L1",
+   "name": "above",
+   "prims": [
+    "above"
+   ],
+   "wording": "none",
+   "text": [
+    "Select every marked object whose centre lies above the topmost visible point of {S}.",
+    "Which marked objects are above {S}? An object is above {S} when its centre lies higher in the image than the topmost visible point of {S}.",
+    "List the marked objects whose centre is higher in the image than the topmost visible point of {S}."
+   ],
+   "neg": [],
+   "exc": [],
+   "probe": [
+    "above"
+   ],
+   "components": [
+    "above"
+   ],
+   "has_opp": false
+  },
+  {
+   "id": "T05",
+   "level": "L1",
+   "name": "same_cat",
+   "prims": [
+    "same_cat"
+   ],
+   "wording": "none",
+   "calibration": true,
+   "text": [
+    "Select every marked object that is the same kind of object as {S} (for example, both are cars).",
+    "Which marked objects belong to the same object category as {S}?",
+    "List the marked objects of the same kind as {S}; for example, if {S} is a car, list the other cars."
+   ],
+   "neg": [],
+   "exc": [],
+   "probe": [
+    "same_cat"
+   ],
+   "components": [
+    "same_cat"
+   ],
+   "has_opp": false
+  },
+  {
+   "id": "T06",
+   "level": "L2",
+   "name": "smaller AND above",
+   "prims": [
+    "smaller",
+    "above"
+   ],
+   "wording": "and",
+   "text": [
+    "Select every marked object that covers fewer image pixels than {S} and whose centre lies above the topmost visible point of {S}.",
+    "Which marked objects are smaller than {S} (they cover fewer image pixels) and above {S} (their centre lies higher than the topmost visible point of {S})?",
+    "List the marked objects that satisfy both conditions: their visible area in pixels is less than that of {S}, and their centre is higher in the image than the topmost visible point of {S}."
+   ],
+   "neg": [],
+   "exc": [],
+   "probe": [
+    "smaller",
+    "above"
+   ],
+   "components": [
+    "size",
+    "above",
+    "AND"
+   ],
+   "has_opp": false
+  },
+  {
+   "id": "T07",
+   "level": "L2",
+   "name": "left AND border",
+   "prims": [
+    "left",
+    "border"
+   ],
+   "wording": "and",
+   "text": [
+    "Select every marked object whose centre lies to the left of the leftmost visible point of {S} and that reaches the edge of the image.",
+    "Which marked objects are left of {S} (their centre lies to the left of the leftmost visible point of {S}) and also reach the edge of the image?",
+    "List the marked objects that satisfy both conditions: their centre is further left in the image than the leftmost visible point of {S}, and they reach the edge of the image."
+   ],
+   "neg": [],
+   "exc": [],
+   "probe": [
+    "left",
+    "border"
+   ],
+   "components": [
+    "left",
+    "border",
+    "AND"
+   ],
+   "has_opp": false
+  },
+  {
+   "id": "T08",
+   "level": "L2",
+   "name": "left AND NOT same_cat",
+   "prims": [
+    "left",
+    "same_cat"
+   ],
+   "neg": [
+    "same_cat"
+   ],
+   "wording": "and-not",
+   "twin": "T13",
+   "text": [
+    "Select every marked object whose centre lies to the left of the leftmost visible point of {S} and that is not the same kind of object as {S}.",
+    "Which marked objects are left of {S} (their centre lies to the left of the leftmost visible point of {S}) and are not the same kind of object as {S}?",
+    "List the marked objects that satisfy both conditions: their centre is further left in the image than the leftmost visible point of {S}, and they are not the same kind of object as {S}."
+   ],
+   "exc": [],
+   "probe": [
+    "left",
+    "same_cat"
+   ],
+   "components": [
+    "left",
+    "same_cat",
+    "AND",
+    "NOT"
+   ],
+   "has_opp": true
+  },
+  {
+   "id": "T09",
+   "level": "L2",
+   "name": "NOT touch AND larger",
+   "prims": [
+    "touch",
+    "larger"
+   ],
+   "neg": [
+    "touch"
+   ],
+   "wording": "and-not",
+   "text": [
+    "Select every marked object that covers more image pixels than {S} and whose visible outline does not share a border with the outline of {S}.",
+    "Which marked objects are larger than {S} (they cover more image pixels) but do not border {S} (their outline shares no border with the outline of {S})?",
+    "List the marked objects that satisfy both conditions: their visible area in pixels is greater than that of {S}, and their visible outline does not meet the outline of {S} anywhere in the image."
+   ],
+   "exc": [],
+   "probe": [
+    "touch",
+    "larger"
+   ],
+   "components": [
+    "touch",
+    "size",
+    "AND",
+    "NOT"
+   ],
+   "has_opp": true
+  },
+  {
+   "id": "T10",
+   "level": "L2",
+   "name": "border AND NOT left",
+   "prims": [
+    "border",
+    "left"
+   ],
+   "neg": [
+    "left"
+   ],
+   "wording": "and-not",
+   "text": [
+    "Select every marked object that reaches the edge of the image and whose centre does not lie to the left of the leftmost visible point of {S}.",
+    "Which marked objects reach the image edge and are not left of {S} (their centre is not to the left of the leftmost visible point of {S})?",
+    "List the marked objects that satisfy both conditions: they reach the edge of the image, and their centre is not further left than the leftmost visible point of {S}."
+   ],
+   "exc": [],
+   "probe": [
+    "border",
+    "left"
+   ],
+   "components": [
+    "left",
+    "border",
+    "AND",
+    "NOT"
+   ],
+   "has_opp": true
+  },
+  {
+   "id": "T11",
+   "level": "L2",
+   "name": "touch AND NOT larger",
+   "prims": [
+    "touch",
+    "larger"
+   ],
+   "neg": [
+    "larger"
+   ],
+   "wording": "and-not",
+   "twin": "T12",
+   "text": [
+    "Select every marked object whose visible outline shares a border with the outline of {S} and that does not cover more image pixels than {S}.",
+    "Which marked objects border {S} (their visible outline shares a border with the outline of {S}) and do not cover more image pixels than {S}?",
+    "List the marked objects that satisfy both conditions: their visible outline meets the outline of {S} in the image, and their visible area in pixels is not greater than that of {S}."
+   ],
+   "exc": [],
+   "probe": [
+    "touch",
+    "larger"
+   ],
+   "components": [
+    "touch",
+    "size",
+    "AND",
+    "NOT"
+   ],
+   "has_opp": true
+  },
+  {
+   "id": "T12",
+   "level": "L2",
+   "name": "touch EXCEPT larger",
+   "prims": [
+    "touch",
+    "larger"
+   ],
+   "exc": [
+    "larger"
+   ],
+   "wording": "except",
+   "twin": "T11",
+   "text": [
+    "Select every marked object whose visible outline shares a border with the outline of {S}, except objects that cover more image pixels than {S}. The exception overrides the first condition.",
+    "Which marked objects border {S} (their visible outline shares a border with the outline of {S})? Leave out any of them that cover more image pixels than {S}; this exception always wins.",
+    "List the marked objects whose visible outline meets the outline of {S} in the image. Exception: do not list an object if it covers more image pixels than {S}, even though it borders {S}."
+   ],
+   "neg": [],
+   "probe": [
+    "touch",
+    "larger"
+   ],
+   "components": [
+    "touch",
+    "size",
+    "AND",
+    "NOT",
+    "EXCEPT"
+   ],
+   "has_opp": true
+  },
+  {
+   "id": "T13",
+   "level": "L2",
+   "name": "left EXCEPT same_cat",
+   "prims": [
+    "left",
+    "same_cat"
+   ],
+   "exc": [
+    "same_cat"
+   ],
+   "wording": "except",
+   "twin": "T08",
+   "text": [
+    "Select every marked object whose centre lies to the left of the leftmost visible point of {S}, except objects that are the same kind of object as {S}. The exception overrides the first condition.",
+    "Which marked objects are left of {S} (their centre lies to the left of the leftmost visible point of {S})? Leave out any of them that are the same kind of object as {S}; this exception always wins.",
+    "List the marked objects whose centre is further left in the image than the leftmost visible point of {S}. Exception: do not list an object if it is the same kind of object as {S}, even though it is left of {S}."
+   ],
+   "neg": [],
+   "probe": [
+    "left",
+    "same_cat"
+   ],
+   "components": [
+    "left",
+    "same_cat",
+    "AND",
+    "NOT",
+    "EXCEPT"
+   ],
+   "has_opp": true
+  },
+  {
+   "id": "T14",
+   "level": "L2",
+   "name": "touch EXCEPT above",
+   "prims": [
+    "touch",
+    "above"
+   ],
+   "exc": [
+    "above"
+   ],
+   "wording": "except",
+   "text": [
+    "Select every marked object whose visible outline shares a border with the outline of {S}, except objects whose centre lies above the topmost visible point of {S}. The exception overrides the first condition.",
+    "Which marked objects border {S} (their visible outline shares a border with the outline of {S})? Leave out any of them whose centre lies above the topmost visible point of {S}; this exception always wins.",
+    "List the marked objects whose visible outline meets the outline of {S} in the image. Exception: do not list an object if its centre is higher in the image than the topmost visible point of {S}, even though it borders {S}."
+   ],
+   "neg": [],
+   "probe": [
+    "touch",
+    "above"
+   ],
+   "components": [
+    "touch",
+    "above",
+    "AND",
+    "NOT",
+    "EXCEPT"
+   ],
+   "has_opp": true
+  },
+  {
+   "id": "T15",
+   "level": "L3",
+   "name": "(touch AND NOT same_cat) EXCEPT border",
+   "prims": [
+    "touch",
+    "same_cat",
+    "border"
+   ],
+   "neg": [
+    "same_cat"
+   ],
+   "exc": [
+    "border"
+   ],
+   "wording": "except",
+   "text": [
+    "Select every marked object whose visible outline shares a border with the outline of {S} and that is not the same kind of object as {S}, except objects that reach the edge of the image. The exception overrides the other conditions.",
+    "Which marked objects border {S} (their visible outline shares a border with the outline of {S}) and are not the same kind of object as {S}? Leave out any of them that reach the edge of the image; this exception always wins.",
+    "List the marked objects whose visible outline meets the outline of {S} and that are not the same kind of object as {S}. Exception: do not list an object if it reaches the edge of the image, even though it meets the other conditions."
+   ],
+   "probe": [
+    "touch",
+    "same_cat",
+    "border"
+   ],
+   "components": [
+    "touch",
+    "same_cat",
+    "border",
+    "AND",
+    "NOT",
+    "EXCEPT"
+   ],
+   "has_opp": true
+  },
+  {
+   "id": "T16",
+   "level": "L3",
+   "name": "CLOSURE_touch(same_cat)",
+   "prims": [
+    "same_cat",
+    "touches"
+   ],
+   "closure": true,
+   "wording": "closure",
+   "text": [
+    "Select every marked object that is the same kind of object as {S}, and also every marked object whose visible outline shares a border with the outline of one of those same-kind marked objects. Sharing a border with {S} itself does not count.",
+    "First find the marked objects of the same kind as {S}. Then add every marked object that borders one of those marked objects, meaning its visible outline shares a border with that object's outline; bordering {S} itself does not count. Which objects are selected?",
+    "List the marked objects of the same kind as {S}, together with any marked object whose visible outline meets the outline of one of those same-kind marked objects in the image. Meeting the outline of {S} itself does not count."
+   ],
+   "neg": [],
+   "exc": [],
+   "probe": [
+    "same_cat",
+    "touches"
+   ],
+   "components": [
+    "same_cat",
+    "CLOSURE"
+   ],
+   "has_opp": true
+  }
+ ],
+ "extensional_twins": [
+  [
+   "T08",
+   "T13"
+  ],
+  [
+   "T11",
+   "T12"
+  ]
+ ],
+ "template_checks": {
+  "not_families": [
+   "category",
+   "size",
+   "spatial",
+   "topology"
+  ],
+  "except_families": [
+   "border",
+   "category",
+   "size",
+   "spatial"
+  ],
+  "q_rank": 10,
+  "q_cols": 10,
+  "q_matrix": {
+   "T01": [
+    "touch"
+   ],
+   "T02": [
+    "size"
+   ],
+   "T03": [
+    "left"
+   ],
+   "T04": [
+    "above"
+   ],
+   "T05": [
+    "same_cat"
+   ],
+   "T06": [
+    "size",
+    "above",
+    "AND"
+   ],
+   "T07": [
+    "left",
+    "border",
+    "AND"
+   ],
+   "T08": [
+    "left",
+    "same_cat",
+    "AND",
+    "NOT"
+   ],
+   "T09": [
+    "touch",
+    "size",
+    "AND",
+    "NOT"
+   ],
+   "T10": [
+    "left",
+    "border",
+    "AND",
+    "NOT"
+   ],
+   "T11": [
+    "touch",
+    "size",
+    "AND",
+    "NOT"
+   ],
+   "T12": [
+    "touch",
+    "size",
+    "AND",
+    "NOT",
+    "EXCEPT"
+   ],
+   "T13": [
+    "left",
+    "same_cat",
+    "AND",
+    "NOT",
+    "EXCEPT"
+   ],
+   "T14": [
+    "touch",
+    "above",
+    "AND",
+    "NOT",
+    "EXCEPT"
+   ],
+   "T15": [
+    "touch",
+    "same_cat",
+    "border",
+    "AND",
+    "NOT",
+    "EXCEPT"
+   ],
+   "T16": [
+    "same_cat",
+    "CLOSURE"
+   ]
+  },
+  "twins": [
+   [
+    "T08",
+    "T13"
+   ],
+   [
+    "T11",
+    "T12"
+   ]
+  ],
+  "and_without_not": [
+   "T06",
+   "T07"
+  ],
+  "fails": []
+ },
+ "twin_mismatch": {
+  "T08/T13": 0,
+  "T11/T12": 0
+ },
+ "rule_stats": {
+  "val": {
+   "T01": {
+    "instances": 2409,
+    "kept": 2360,
+    "pairs": 19213,
+    "pairs_U": 1033,
+    "pairs_pos": 5465,
+    "empty": 362,
+    "sum_S": 5391,
+    "ch": 796,
+    "opp": 0
+   },
+   "T02": {
+    "instances": 2409,
+    "kept": 2071,
+    "pairs": 19213,
+    "pairs_U": 2593,
+    "pairs_pos": 2283,
+    "empty": 1093,
+    "sum_S": 1901,
+    "ch": 801,
+    "opp": 0
+   },
+   "T03": {
+    "instances": 2409,
+    "kept": 2393,
+    "pairs": 19213,
+    "pairs_U": 616,
+    "pairs_pos": 5807,
+    "empty": 892,
+    "sum_S": 5781,
+    "ch": 734,
+    "opp": 0
+   },
+   "T04": {
+    "instances": 2409,
+    "kept": 2364,
+    "pairs": 19213,
+    "pairs_U": 810,
+    "pairs_pos": 4513,
+    "empty": 1251,
+    "sum_S": 4458,
+    "ch": 1164,
+    "opp": 0
+   },
+   "T05": {
+    "instances": 2409,
+    "kept": 2409,
+    "pairs": 19213,
+    "pairs_U": 0,
+    "pairs_pos": 4514,
+    "empty": 1257,
+    "sum_S": 4514,
+    "ch": 0,
+    "opp": 0
+   },
+   "T06": {
+    "instances": 2409,
+    "kept": 2294,
+    "pairs": 19213,
+    "pairs_U": 1259,
+    "pairs_pos": 3442,
+    "empty": 1357,
+    "sum_S": 3273,
+    "ch": 759,
+    "opp": 0
+   },
+   "T07": {
+    "instances": 2409,
+    "kept": 2403,
+    "pairs": 19213,
+    "pairs_U": 422,
+    "pairs_pos": 2118,
+    "empty": 1303,
+    "sum_S": 2111,
+    "ch": 450,
+    "opp": 0
+   },
+   "T08": {
+    "instances": 2409,
+    "kept": 2396,
+    "pairs": 19213,
+    "pairs_U": 467,
+    "pairs_pos": 4142,
+    "empty": 1067,
+    "sum_S": 4130,
+    "ch": 639,
+    "opp": 673
+   },
+   "T09": {
+    "instances": 2409,
+    "kept": 2206,
+    "pairs": 19213,
+    "pairs_U": 1854,
+    "pairs_pos": 1193,
+    "empty": 1551,
+    "sum_S": 1052,
+    "ch": 692,
+    "opp": 675
+   },
+   "T10": {
+    "instances": 2409,
+    "kept": 2394,
+    "pairs": 19213,
+    "pairs_U": 647,
+    "pairs_pos": 4361,
+    "empty": 702,
+    "sum_S": 4345,
+    "ch": 447,
+    "opp": 1101
+   },
+   "T11": {
+    "instances": 2409,
+    "kept": 2256,
+    "pairs": 19213,
+    "pairs_U": 1772,
+    "pairs_pos": 3636,
+    "empty": 837,
+    "sum_S": 3486,
+    "ch": 763,
+    "opp": 724
+   },
+   "T12": {
+    "instances": 2409,
+    "kept": 2256,
+    "pairs": 19213,
+    "pairs_U": 1772,
+    "pairs_pos": 3636,
+    "empty": 837,
+    "sum_S": 3486,
+    "ch": 763,
+    "opp": 724
+   },
+   "T13": {
+    "instances": 2409,
+    "kept": 2396,
+    "pairs": 19213,
+    "pairs_U": 467,
+    "pairs_pos": 4142,
+    "empty": 1067,
+    "sum_S": 4130,
+    "ch": 639,
+    "opp": 673
+   },
+   "T14": {
+    "instances": 2409,
+    "kept": 2354,
+    "pairs": 19213,
+    "pairs_U": 1129,
+    "pairs_pos": 4460,
+    "empty": 540,
+    "sum_S": 4380,
+    "ch": 1104,
+    "opp": 476
+   },
+   "T15": {
+    "instances": 2409,
+    "kept": 2382,
+    "pairs": 19213,
+    "pairs_U": 726,
+    "pairs_pos": 2595,
+    "empty": 1018,
+    "sum_S": 2571,
+    "ch": 402,
+    "opp": 1039
+   },
+   "T16": {
+    "instances": 2409,
+    "kept": 2401,
+    "pairs": 19213,
+    "pairs_U": 335,
+    "pairs_pos": 6872,
+    "empty": 1257,
+    "sum_S": 6849,
+    "ch": 0,
+    "opp": 915
+   }
+  },
+  "train": {
+   "T01": {
+    "instances": 58321,
+    "kept": 56981,
+    "pairs": 465549,
+    "pairs_U": 26811,
+    "pairs_pos": 133715,
+    "empty": 7721,
+    "sum_S": 131653,
+    "ch": 18251,
+    "opp": 0
+   },
+   "T02": {
+    "instances": 58321,
+    "kept": 51096,
+    "pairs": 465549,
+    "pairs_U": 57523,
+    "pairs_pos": 53152,
+    "empty": 26320,
+    "sum_S": 46427,
+    "ch": 17950,
+    "opp": 0
+   },
+   "T03": {
+    "instances": 58321,
+    "kept": 57973,
+    "pairs": 465549,
+    "pairs_U": 15918,
+    "pairs_pos": 143229,
+    "empty": 21336,
+    "sum_S": 142776,
+    "ch": 18187,
+    "opp": 0
+   },
+   "T04": {
+    "instances": 58321,
+    "kept": 57164,
+    "pairs": 465549,
+    "pairs_U": 18183,
+    "pairs_pos": 102888,
+    "empty": 31551,
+    "sum_S": 101140,
+    "ch": 27676,
+    "opp": 0
+   },
+   "T05": {
+    "instances": 58321,
+    "kept": 58321,
+    "pairs": 465549,
+    "pairs_U": 0,
+    "pairs_pos": 110704,
+    "empty": 29610,
+    "sum_S": 110704,
+    "ch": 0,
+    "opp": 0
+   },
+   "T06": {
+    "instances": 58321,
+    "kept": 55881,
+    "pairs": 465549,
+    "pairs_U": 27104,
+    "pairs_pos": 80651,
+    "empty": 34091,
+    "sum_S": 76870,
+    "ch": 17604,
+    "opp": 0
+   },
+   "T07": {
+    "instances": 58321,
+    "kept": 58072,
+    "pairs": 465549,
+    "pairs_U": 10740,
+    "pairs_pos": 52780,
+    "empty": 30743,
+    "sum_S": 52614,
+    "ch": 11781,
+    "opp": 0
+   },
+   "T08": {
+    "instances": 58321,
+    "kept": 58083,
+    "pairs": 465549,
+    "pairs_U": 12053,
+    "pairs_pos": 102795,
+    "empty": 26153,
+    "sum_S": 102523,
+    "ch": 16141,
+    "opp": 16585
+   },
+   "T09": {
+    "instances": 58321,
+    "kept": 54007,
+    "pairs": 465549,
+    "pairs_U": 41198,
+    "pairs_pos": 26175,
+    "empty": 38756,
+    "sum_S": 23511,
+    "ch": 15656,
+    "opp": 17644
+   },
+   "T10": {
+    "instances": 58321,
+    "kept": 57732,
+    "pairs": 465549,
+    "pairs_U": 15593,
+    "pairs_pos": 101218,
+    "empty": 16029,
+    "sum_S": 100629,
+    "ch": 11738,
+    "opp": 27312
+   },
+   "T11": {
+    "instances": 58321,
+    "kept": 54581,
+    "pairs": 465549,
+    "pairs_U": 43136,
+    "pairs_pos": 90413,
+    "empty": 19821,
+    "sum_S": 86235,
+    "ch": 18206,
+    "opp": 18458
+   },
+   "T12": {
+    "instances": 58321,
+    "kept": 54581,
+    "pairs": 465549,
+    "pairs_U": 43136,
+    "pairs_pos": 90413,
+    "empty": 19821,
+    "sum_S": 86235,
+    "ch": 18206,
+    "opp": 18458
+   },
+   "T13": {
+    "instances": 58321,
+    "kept": 58083,
+    "pairs": 465549,
+    "pairs_U": 12053,
+    "pairs_pos": 102795,
+    "empty": 26153,
+    "sum_S": 102523,
+    "ch": 16141,
+    "opp": 16585
+   },
+   "T14": {
+    "instances": 58321,
+    "kept": 56753,
+    "pairs": 465549,
+    "pairs_U": 28447,
+    "pairs_pos": 111917,
+    "empty": 11809,
+    "sum_S": 109718,
+    "ch": 25963,
+    "opp": 10519
+   },
+   "T15": {
+    "instances": 58321,
+    "kept": 57529,
+    "pairs": 465549,
+    "pairs_U": 18154,
+    "pairs_pos": 63046,
+    "empty": 24765,
+    "sum_S": 62215,
+    "ch": 9998,
+    "opp": 26421
+   },
+   "T16": {
+    "instances": 58321,
+    "kept": 58136,
+    "pairs": 465549,
+    "pairs_U": 9671,
+    "pairs_pos": 169618,
+    "empty": 29610,
+    "sum_S": 169094,
+    "ch": 0,
+    "opp": 23034
+   }
+  }
+ },
+ "size_hist": {
+  "val": {
+   "T01": {
+    "0": 362,
+    "2": 569,
+    "1": 557,
+    "5+": 246,
+    "4": 225,
+    "3": 401
+   },
+   "T02": {
+    "0": 1093,
+    "1": 457,
+    "2": 270,
+    "3": 156,
+    "4": 63,
+    "5+": 32
+   },
+   "T03": {
+    "0": 892,
+    "5+": 459,
+    "3": 241,
+    "2": 313,
+    "1": 304,
+    "4": 184
+   },
+   "T04": {
+    "0": 1251,
+    "3": 164,
+    "5+": 351,
+    "1": 245,
+    "2": 212,
+    "4": 141
+   },
+   "T05": {
+    "0": 1257,
+    "3": 129,
+    "2": 233,
+    "5+": 354,
+    "1": 297,
+    "4": 139
+   },
+   "T06": {
+    "0": 1357,
+    "3": 150,
+    "5+": 238,
+    "1": 274,
+    "4": 90,
+    "2": 185
+   },
+   "T07": {
+    "0": 1303,
+    "2": 320,
+    "3": 138,
+    "1": 534,
+    "4": 62,
+    "5+": 46
+   },
+   "T08": {
+    "0": 1067,
+    "4": 135,
+    "5+": 268,
+    "2": 321,
+    "1": 385,
+    "3": 220
+   },
+   "T09": {
+    "0": 1551,
+    "1": 390,
+    "3": 59,
+    "2": 179,
+    "5+": 12,
+    "4": 15
+   },
+   "T10": {
+    "0": 702,
+    "1": 579,
+    "2": 431,
+    "4": 183,
+    "3": 285,
+    "5+": 214
+   },
+   "T11": {
+    "0": 837,
+    "2": 351,
+    "1": 557,
+    "5+": 152,
+    "4": 132,
+    "3": 227
+   },
+   "T12": {
+    "0": 837,
+    "2": 351,
+    "1": 557,
+    "5+": 152,
+    "4": 132,
+    "3": 227
+   },
+   "T13": {
+    "0": 1067,
+    "4": 135,
+    "5+": 268,
+    "2": 321,
+    "1": 385,
+    "3": 220
+   },
+   "T14": {
+    "0": 540,
+    "1": 635,
+    "5+": 164,
+    "2": 509,
+    "3": 328,
+    "4": 178
+   },
+   "T15": {
+    "0": 1018,
+    "2": 341,
+    "1": 744,
+    "5+": 67,
+    "3": 148,
+    "4": 64
+   },
+   "T16": {
+    "0": 1257,
+    "3": 155,
+    "2": 131,
+    "5+": 633,
+    "4": 166,
+    "1": 59
+   }
+  },
+  "train": {
+   "T01": {
+    "1": 14490,
+    "4": 5600,
+    "3": 9570,
+    "2": 13571,
+    "0": 7721,
+    "5+": 6029
+   },
+   "T02": {
+    "0": 26320,
+    "1": 12287,
+    "2": 6700,
+    "4": 1516,
+    "3": 3506,
+    "5+": 767
+   },
+   "T03": {
+    "1": 7782,
+    "0": 21336,
+    "2": 6841,
+    "5+": 11411,
+    "3": 5872,
+    "4": 4731
+   },
+   "T04": {
+    "3": 3560,
+    "2": 4415,
+    "0": 31551,
+    "5+": 8041,
+    "4": 3096,
+    "1": 6501
+   },
+   "T05": {
+    "0": 29610,
+    "3": 4137,
+    "1": 7516,
+    "2": 5348,
+    "4": 3295,
+    "5+": 8415
+   },
+   "T06": {
+    "3": 3089,
+    "0": 34091,
+    "5+": 5658,
+    "4": 2276,
+    "1": 6645,
+    "2": 4122
+   },
+   "T07": {
+    "1": 13435,
+    "0": 30743,
+    "2": 7528,
+    "5+": 1258,
+    "3": 3562,
+    "4": 1546
+   },
+   "T08": {
+    "1": 9549,
+    "0": 26153,
+    "2": 6894,
+    "5+": 7068,
+    "3": 4939,
+    "4": 3480
+   },
+   "T09": {
+    "0": 38756,
+    "1": 9571,
+    "2": 3820,
+    "4": 409,
+    "3": 1315,
+    "5+": 136
+   },
+   "T10": {
+    "3": 7194,
+    "4": 4010,
+    "0": 16029,
+    "1": 15208,
+    "2": 11126,
+    "5+": 4165
+   },
+   "T11": {
+    "0": 19821,
+    "1": 13597,
+    "2": 8724,
+    "3": 5249,
+    "5+": 4042,
+    "4": 3148
+   },
+   "T12": {
+    "0": 19821,
+    "1": 13597,
+    "2": 8724,
+    "3": 5249,
+    "5+": 4042,
+    "4": 3148
+   },
+   "T13": {
+    "1": 9549,
+    "0": 26153,
+    "2": 6894,
+    "5+": 7068,
+    "3": 4939,
+    "4": 3480
+   },
+   "T14": {
+    "1": 15882,
+    "3": 7877,
+    "2": 12412,
+    "0": 11809,
+    "4": 4411,
+    "5+": 4362
+   },
+   "T15": {
+    "0": 24765,
+    "1": 17985,
+    "3": 3410,
+    "2": 8112,
+    "4": 1526,
+    "5+": 1731
+   },
+   "T16": {
+    "0": 29610,
+    "3": 3950,
+    "4": 4228,
+    "2": 3194,
+    "5+": 15586,
+    "1": 1568
+   }
+  }
+ },
+ "scene": {
+  "val": {
+   "io": {
+    "indoor": 541,
+    "outdoor": 539,
+    "unknown": 62
+   },
+   "io_stuff": {
+    "indoor": 450,
+    "outdoor": 545,
+    "unknown": 147
+   },
+   "io_agree": {
+    "agree": 966,
+    "disagree": 25,
+    "undecided": 151
+   },
+   "food": {
+    "False": 897,
+    "True": 245
+   },
+   "people_in_image": {
+    "True": 862,
+    "False": 280
+   },
+   "settings": {
+    "dining_restaurant": 196,
+    "kitchen": 96,
+    "living_room": 127,
+    "bedroom": 31,
+    "beach_water": 66,
+    "street_urban": 248,
+    "railway": 36,
+    "road_traffic": 175,
+    "(none)": 153,
+    "farm_pasture": 19,
+    "office_workspace": 104,
+    "airport": 11,
+    "park_field": 162,
+    "sports_venue": 112,
+    "sky_air": 44,
+    "store_market": 42,
+    "bathroom": 18,
+    "mountain_snow": 56,
+    "wild_nature": 17
+   },
+   "subject_type": {
+    "object": 1063,
+    "human": 902,
+    "vehicle": 238,
+    "food": 111,
+    "animal": 95
+   },
+   "subject_type_phrase_agree": {
+    "agree": 2319,
+    "phrase unknown": 57,
+    "disagree": 33
+   },
+   "subject_category": {
+    "tv": 76,
+    "bed": 17,
+    "person": 902,
+    "handbag": 27,
+    "train": 25,
+    "car": 56,
+    "bowl": 60,
+    "cake": 32,
+    "dining table": 182,
+    "wine glass": 10,
+    "couch": 79,
+    "chair": 61,
+    "horse": 20,
+    "truck": 40,
+    "refrigerator": 37,
+    "oven": 19,
+    "sink": 12,
+    "motorcycle": 36,
+    "suitcase": 25,
+    "knife": 7,
+    "bicycle": 17,
+    "bench": 28,
+    "kite": 4,
+    "spoon": 4,
+    "surfboard": 15,
+    "bus": 56,
+    "pizza": 33,
+    "sandwich": 10,
+    "dog": 21,
+    "cat": 35,
+    "cup": 52,
+    "bottle": 47,
+    "laptop": 54,
+    "umbrella": 52,
+    "parking meter": 4,
+    "backpack": 21,
+    "toilet": 8,
+    "tennis racket": 9,
+    "book": 16,
+    "keyboard": 28,
+    "donut": 19,
+    "orange": 7,
+    "cell phone": 9,
+    "boat": 5,
+    "banana": 3,
+    "bird": 2,
+    "skateboard": 6,
+    "fire hydrant": 12,
+    "microwave": 5,
+    "teddy bear": 15,
+    "vase": 19,
+    "fork": 10,
+    "frisbee": 2,
+    "cow": 6,
+    "apple": 3,
+    "stop sign": 2,
+    "tie": 2,
+    "hot dog": 3,
+    "toaster": 1,
+    "airplane": 3,
+    "traffic light": 4,
+    "clock": 10,
+    "sheep": 2,
+    "bear": 1,
+    "broccoli": 1,
+    "giraffe": 4,
+    "mouse": 3,
+    "remote": 3,
+    "elephant": 4,
+    "potted plant": 4,
+    "snowboard": 1,
+    "hair drier": 1
+   },
+   "text_ok": {
+    "True": 2304,
+    "False": 105
+   },
+   "clutter": {
+    "9": 165,
+    "5": 382,
+    "8": 212,
+    "7": 238,
+    "4": 453,
+    "15": 53,
+    "10": 133,
+    "11": 130,
+    "6": 276,
+    "18": 29,
+    "12": 67,
+    "14": 72,
+    "19": 22,
+    "13": 75,
+    "17": 38,
+    "16": 55,
+    "20": 9
+   }
+  },
+  "train": {
+   "io": {
+    "unknown": 1346,
+    "outdoor": 12337,
+    "indoor": 13311
+   },
+   "io_stuff": {
+    "unknown": 4002,
+    "outdoor": 12294,
+    "indoor": 10698
+   },
+   "io_agree": {
+    "agree": 22579,
+    "undecided": 3820,
+    "disagree": 595
+   },
+   "food": {
+    "True": 6348,
+    "False": 20646
+   },
+   "people_in_image": {
+    "False": 6462,
+    "True": 20532
+   },
+   "settings": {
+    "(none)": 3696,
+    "park_field": 3800,
+    "kitchen": 2534,
+    "dining_restaurant": 5201,
+    "living_room": 2675,
+    "road_traffic": 4584,
+    "street_urban": 5492,
+    "beach_water": 1439,
+    "office_workspace": 2265,
+    "sports_venue": 3199,
+    "airport": 456,
+    "sky_air": 1475,
+    "bedroom": 941,
+    "railway": 637,
+    "store_market": 1126,
+    "mountain_snow": 1636,
+    "farm_pasture": 362,
+    "wild_nature": 526,
+    "bathroom": 308
+   },
+   "subject_type": {
+    "food": 2666,
+    "object": 23555,
+    "animal": 2441,
+    "human": 23894,
+    "vehicle": 5765
+   },
+   "subject_type_phrase_agree": {
+    "agree": 57022,
+    "phrase unknown": 887,
+    "disagree": 412
+   },
+   "subject_category": {
+    "broccoli": 103,
+    "bowl": 1432,
+    "horse": 490,
+    "oven": 716,
+    "microwave": 326,
+    "pizza": 662,
+    "refrigerator": 907,
+    "vase": 291,
+    "dining table": 3033,
+    "person": 23894,
+    "potted plant": 429,
+    "bus": 1026,
+    "bottle": 709,
+    "chair": 2062,
+    "wine glass": 278,
+    "bench": 573,
+    "laptop": 1175,
+    "cell phone": 166,
+    "cup": 1334,
+    "cat": 555,
+    "remote": 72,
+    "couch": 1713,
+    "airplane": 312,
+    "bed": 659,
+    "tv": 1492,
+    "train": 470,
+    "skateboard": 161,
+    "kite": 167,
+    "motorcycle": 848,
+    "umbrella": 837,
+    "cake": 903,
+    "dog": 668,
+    "fork": 169,
+    "keyboard": 510,
+    "tie": 139,
+    "snowboard": 74,
+    "sandwich": 360,
+    "teddy bear": 397,
+    "tennis racket": 150,
+    "truck": 1070,
+    "spoon": 140,
+    "sink": 309,
+    "toaster": 26,
+    "backpack": 499,
+    "handbag": 589,
+    "car": 1213,
+    "cow": 196,
+    "book": 329,
+    "bicycle": 460,
+    "toilet": 137,
+    "apple": 69,
+    "giraffe": 82,
+    "stop sign": 91,
+    "surfboard": 197,
+    "clock": 158,
+    "zebra": 34,
+    "donut": 245,
+    "sheep": 89,
+    "boat": 366,
+    "mouse": 44,
+    "suitcase": 432,
+    "scissors": 29,
+    "knife": 205,
+    "baseball glove": 19,
+    "fire hydrant": 156,
+    "banana": 77,
+    "hot dog": 139,
+    "baseball bat": 25,
+    "elephant": 214,
+    "parking meter": 62,
+    "bear": 21,
+    "toothbrush": 14,
+    "frisbee": 32,
+    "bird": 92,
+    "carrot": 19,
+    "skis": 21,
+    "orange": 89,
+    "traffic light": 46,
+    "sports ball": 17,
+    "hair drier": 7
+   },
+   "text_ok": {
+    "True": 56847,
+    "False": 1474
+   },
+   "clutter": {
+    "4": 11015,
+    "8": 4768,
+    "17": 908,
+    "7": 5868,
+    "13": 1921,
+    "6": 7273,
+    "20": 518,
+    "5": 9150,
+    "14": 1517,
+    "9": 3853,
+    "12": 2003,
+    "15": 1337,
+    "11": 2743,
+    "10": 3095,
+    "16": 988,
+    "19": 623,
+    "18": 741
+   }
+  }
+ },
+ "draft": {
+  "n": 7000,
+  "per_template": {
+   "T14": {
+    "0": 75,
+    "all": 500,
+    "role_target": 500,
+    "src_train": 339,
+    "ch": 269,
+    "opp": 350,
+    "src_val": 161,
+    "1": 90,
+    "3": 85,
+    "5+": 85,
+    "2": 90,
+    "4": 75,
+    "paired_all": 86,
+    "paired_any": 166
+   },
+   "T01": {
+    "0": 49,
+    "all": 300,
+    "role_companion": 300,
+    "src_train": 208,
+    "ch": 102,
+    "opp": 0,
+    "1": 71,
+    "2": 80,
+    "src_val": 92,
+    "3": 47,
+    "4": 29,
+    "5+": 24
+   },
+   "T04": {
+    "5+": 57,
+    "all": 300,
+    "role_companion": 300,
+    "src_train": 222,
+    "ch": 159,
+    "opp": 0,
+    "0": 138,
+    "src_val": 78,
+    "4": 16,
+    "3": 21,
+    "1": 45,
+    "2": 23
+   },
+   "T06": {
+    "0": 75,
+    "all": 500,
+    "role_target": 500,
+    "src_train": 350,
+    "ch": 263,
+    "opp": 0,
+    "5+": 85,
+    "4": 85,
+    "3": 85,
+    "src_val": 150,
+    "1": 85,
+    "2": 85,
+    "paired_all": 126,
+    "paired_any": 196
+   },
+   "T02": {
+    "4": 15,
+    "all": 300,
+    "role_companion": 300,
+    "src_train": 215,
+    "ch": 111,
+    "opp": 0,
+    "1": 66,
+    "0": 142,
+    "src_val": 85,
+    "2": 56,
+    "3": 18,
+    "5+": 3
+   },
+   "T16": {
+    "0": 75,
+    "all": 500,
+    "role_target": 500,
+    "src_val": 156,
+    "ch": 0,
+    "opp": 350,
+    "3": 96,
+    "src_train": 344,
+    "5+": 118,
+    "1": 19,
+    "4": 97,
+    "2": 95,
+    "paired_all": 224,
+    "paired_any": 224
+   },
+   "T05": {
+    "0": 115,
+    "all": 300,
+    "role_companion": 300,
+    "src_val": 87,
+    "ch": 0,
+    "opp": 0,
+    "2": 26,
+    "3": 23,
+    "src_train": 213,
+    "5+": 66,
+    "1": 45,
+    "4": 25
+   },
+   "T08": {
+    "0": 75,
+    "all": 500,
+    "role_target": 357,
+    "src_val": 143,
+    "ch": 131,
+    "opp": 350,
+    "1": 85,
+    "role_twin": 143,
+    "src_train": 357,
+    "3": 85,
+    "5+": 85,
+    "2": 85,
+    "4": 85,
+    "paired_all": 0,
+    "paired_any": 201
+   },
+   "T13": {
+    "1": 85,
+    "all": 500,
+    "role_target": 351,
+    "src_train": 360,
+    "ch": 131,
+    "opp": 350,
+    "5+": 85,
+    "0": 75,
+    "src_val": 140,
+    "role_twin": 149,
+    "2": 85,
+    "4": 85,
+    "3": 85,
+    "paired_all": 0,
+    "paired_any": 203
+   },
+   "T03": {
+    "3": 32,
+    "all": 300,
+    "role_companion": 300,
+    "src_train": 218,
+    "ch": 94,
+    "opp": 0,
+    "4": 25,
+    "src_val": 82,
+    "5+": 55,
+    "1": 46,
+    "0": 102,
+    "2": 40
+   },
+   "T12": {
+    "0": 75,
+    "all": 500,
+    "role_target": 308,
+    "src_train": 364,
+    "ch": 192,
+    "opp": 350,
+    "3": 86,
+    "role_twin": 192,
+    "1": 122,
+    "src_val": 136,
+    "4": 59,
+    "2": 102,
+    "5+": 56,
+    "paired_all": 0,
+    "paired_any": 141
+   },
+   "T11": {
+    "0": 75,
+    "all": 500,
+    "role_twin": 199,
+    "src_train": 362,
+    "ch": 193,
+    "opp": 350,
+    "3": 86,
+    "role_target": 301,
+    "1": 120,
+    "src_val": 138,
+    "4": 61,
+    "2": 102,
+    "5+": 56,
+    "paired_all": 0,
+    "paired_any": 139
+   },
+   "T09": {
+    "0": 75,
+    "all": 500,
+    "role_target": 500,
+    "src_train": 345,
+    "ch": 264,
+    "opp": 350,
+    "src_val": 155,
+    "1": 159,
+    "3": 89,
+    "2": 122,
+    "4": 36,
+    "5+": 19,
+    "paired_all": 86,
+    "paired_any": 144
+   },
+   "T07": {
+    "1": 85,
+    "all": 500,
+    "role_target": 500,
+    "src_val": 136,
+    "ch": 123,
+    "opp": 0,
+    "0": 75,
+    "src_train": 364,
+    "2": 85,
+    "5+": 85,
+    "3": 85,
+    "4": 85,
+    "paired_all": 165,
+    "paired_any": 165
+   },
+   "T10": {
+    "0": 75,
+    "all": 500,
+    "role_target": 500,
+    "src_val": 144,
+    "ch": 180,
+    "opp": 350,
+    "1": 85,
+    "src_train": 356,
+    "5+": 85,
+    "2": 85,
+    "4": 85,
+    "3": 85,
+    "paired_all": 164,
+    "paired_any": 164
+   },
+   "T15": {
+    "0": 75,
+    "all": 500,
+    "role_target": 500,
+    "src_val": 153,
+    "ch": 118,
+    "opp": 350,
+    "1": 85,
+    "src_train": 347,
+    "2": 85,
+    "4": 85,
+    "3": 85,
+    "5+": 85,
+    "paired_all": 29,
+    "paired_any": 133
+   }
+  },
+  "targets": {
+   "L1": 300,
+   "L2": 500,
+   "L3": 500
+  },
+  "bin_share": {
+   "0": 0.15,
+   "1": 0.17,
+   "2": 0.17,
+   "3": 0.17,
+   "4": 0.17,
+   "5+": 0.17
+  },
+  "min_opp": 0.7,
+  "max_per_anchor": 3,
+  "anchors": 3120,
+  "images": 2568,
+  "templates_per_anchor": {
+   "3": 1714,
+   "2": 452,
+   "1": 954
+  },
+  "probes_with_touches": 500,
+  "calls_per_model": {
+   "direct": 14000,
+   "probe": 6240
+  }
+ },
+ "diagnostic": {
+  "templates": [
+   {
+    "id": "C01",
+    "level": "L1",
+    "name": "contact (caption)",
+    "prims": [
+     "contact"
+    ],
+    "wording": "none",
+    "pair": "T01",
+    "text": [
+     "Select every marked object that is physically touching {S}: resting on it, leaning on it, or held, worn, carried or ridden by it, or the reverse.",
+     "Which marked objects are physically touching {S}? Count objects resting on or leaning on {S}, objects {S} holds, wears, carries or rides, and the reverse.",
+     "List the marked objects in physical contact with {S}, such as objects resting on it, leaning on it, or held, worn, carried or ridden by it, and the reverse."
+    ],
+    "neg": [],
+    "exc": [],
+    "probe": [],
+    "components": [],
+    "diagnostic": true
+   }
+  ],
+  "rule_stats": {
+   "val": {
+    "C01": {
+     "instances": 2409,
+     "kept": 1236,
+     "pairs": 19213,
+     "pairs_U": 6242,
+     "empty": 1113,
+     "sum_S": 149
+    }
+   },
+   "train": {
+    "C01": {
+     "instances": 58321,
+     "kept": 28669,
+     "pairs": 465549,
+     "pairs_U": 156576,
+     "empty": 26630,
+     "sum_S": 2404
+    }
+   }
+  },
+  "size_hist": {
+   "val": {
+    "C01": {
+     "0": 1113,
+     "1": 106,
+     "2": 10,
+     "3": 6,
+     "5+": 1
+    }
+   },
+   "train": {
+    "C01": {
+     "1": 1870,
+     "0": 26630,
+     "4": 15,
+     "2": 96,
+     "5+": 31,
+     "3": 27
+    }
+   }
+  },
+  "contact_audit": {
+   "val": {
+    "pairs_outlines_meet": 5465,
+    "pairs_outlines_meet_stated": 256,
+    "stated_contact": 305,
+    "stated_meet": 256,
+    "stated_far": 40,
+    "stated_near": 9
+   },
+   "train": {
+    "pairs_outlines_meet": 133715,
+    "pairs_outlines_meet_stated": 3950,
+    "stated_contact": 4560,
+    "stated_meet": 3950,
+    "stated_occlude": 26,
+    "stated_far": 493,
+    "stated_near": 143
+   }
+  },
+  "sample": {
+   "n": 540,
+   "target": 300,
+   "empty_share": 0.15,
+   "per_role": {
+    "diag": 300,
+    "diag_pair": 240
+   },
+   "per_size": {
+    "1": 229,
+    "0": 45,
+    "3": 3,
+    "2": 19,
+    "5+": 4
+   },
+   "anchors": 300,
+   "anchors_in_main": 168,
+   "calls_per_model": {
+    "direct": 1080
+   }
+  }
+ }
+}

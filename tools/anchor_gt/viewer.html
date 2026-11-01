@@ -1,0 +1,578 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>ANCHOR viewer</title>
+<style>
+:root {
+  color-scheme: light;
+  --bg: #f7f7f5; --panel: #fff; --line: #e4e4e0; --text: #1f2328; --muted: #6b7076; --soft: #f1f1ee;
+  --accent: #2563eb; --subj: #c026d3; --yes: #15803d; --yes-bg: #e7f6ec; --skip: #b45309; --skip-bg: #fdf3e2;
+  --no: #9ca3af; --warn-bg: #fff7e6;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { background: var(--bg); color: var(--text); font: 15px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; display: flex; flex-direction: column; }
+button, select, input { font: inherit; color: inherit; }
+a { color: var(--accent); }
+.muted { color: var(--muted); } .small { font-size: 13px; } .num { font-variant-numeric: tabular-nums; }
+
+header { display: flex; align-items: center; gap: 6px; padding: 0 20px; height: 54px; background: var(--panel); border-bottom: 1px solid var(--line); flex: none; }
+header h1 { font-size: 16px; margin: 0 22px 0 0; font-weight: 650; }
+.tab { border: 0; background: none; padding: 15px 14px 13px; color: var(--muted); font-weight: 600; cursor: pointer; border-bottom: 3px solid transparent; }
+.tab.on { color: var(--text); border-bottom-color: var(--accent); }
+.spacer { flex: 1; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.seg button { border: 0; background: var(--panel); padding: 5px 13px; cursor: pointer; color: var(--muted); }
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button.on { background: var(--accent); color: #fff; }
+
+.page { display: none; flex: 1; min-height: 0; overflow-y: auto; }
+.page.on { display: block; }
+.wrap { max-width: 980px; margin: 0 auto; padding: 28px 22px 80px; }
+h2 { font-size: 22px; margin: 0 0 6px; font-weight: 650; }
+h3 { font-size: 16px; margin: 30px 0 10px; font-weight: 650; }
+p.lead { color: var(--muted); margin: 0 0 22px; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; margin-bottom: 14px; }
+
+/* overview */
+.tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 8px; }
+.tile { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; }
+.tile b { display: block; font-size: 28px; font-weight: 650; line-height: 1.2; }
+.step { display: grid; grid-template-columns: minmax(0, 1fr) 90px 70px; gap: 12px; align-items: center; padding: 9px 0; border-top: 1px solid var(--soft); }
+.step:first-child { border-top: 0; }
+.bar { height: 8px; background: var(--soft); border-radius: 4px; margin-top: 5px; overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--accent); border-radius: 4px; }
+.step .lost { color: #b42318; font-size: 13px; text-align: right; }
+.step.final { font-weight: 650; }
+.dist { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.drow { display: grid; grid-template-columns: 110px minmax(0, 1fr) 60px; gap: 10px; align-items: center; font-size: 14px; margin: 5px 0; }
+details > summary { cursor: pointer; font-weight: 600; padding: 4px 0; }
+details > summary::marker { color: var(--muted); }
+
+/* rules */
+.rule { border-top: 1px solid var(--soft); }
+.rule:first-child { border-top: 0; }
+.rule > button { all: unset; box-sizing: border-box; display: grid; grid-template-columns: 52px minmax(0, 1fr) 120px 120px 20px; gap: 12px; align-items: center; width: 100%; padding: 11px 4px; cursor: pointer; }
+.rule > button:hover { background: var(--soft); }
+.rid { font: 600 13px ui-monospace, monospace; color: var(--muted); }
+.tagline { font-size: 12px; color: var(--muted); margin-left: 8px; }
+.rule .body { padding: 4px 4px 16px 64px; display: none; }
+.rule.open .body { display: block; }
+.rule.open .chev { transform: rotate(90deg); }
+.chev { color: var(--muted); transition: transform .15s; }
+.quote { border-left: 3px solid var(--line); padding: 2px 0 2px 12px; margin: 6px 0; }
+.s { color: var(--subj); font-weight: 600; }
+.mini { display: inline-flex; gap: 3px; align-items: flex-end; height: 34px; vertical-align: middle; }
+.mini i { width: 14px; background: var(--accent); opacity: .75; border-radius: 2px 2px 0 0; }
+.minil { display: inline-flex; gap: 3px; font-size: 11px; color: var(--muted); }
+.minil span { width: 14px; text-align: center; }
+
+/* images */
+#im.on { display: grid; grid-template-columns: 250px minmax(0, 1fr) 420px; overflow: hidden; }
+@media (max-width: 1250px) { #im.on { grid-template-columns: 230px minmax(0, 1fr); } #side2 { grid-column: 2; } #im.on { overflow-y: auto; } }
+#side { background: var(--panel); border-right: 1px solid var(--line); display: flex; flex-direction: column; min-height: 0; }
+#side .f { padding: 14px 14px 8px; display: grid; gap: 9px; }
+#side label.l { font-size: 12px; color: var(--muted); display: block; margin-bottom: 2px; }
+#side select, #side input[type=text] { width: 100%; padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
+#list { flex: 1; overflow-y: auto; border-top: 1px solid var(--line); }
+#list .it { padding: 8px 14px; cursor: pointer; display: flex; justify-content: space-between; font-size: 14px; }
+#list .it:hover { background: var(--soft); }
+#list .it.sel { background: #e8effd; }
+#pager { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; border-top: 1px solid var(--line); font-size: 13px; }
+#pager button { border: 1px solid var(--line); background: #fff; border-radius: 6px; padding: 2px 10px; cursor: pointer; }
+#main { overflow-y: auto; padding: 18px 22px 40px; min-width: 0; }
+#side2 { overflow-y: auto; padding: 18px 20px 40px; border-left: 1px solid var(--line); background: var(--panel); }
+.pick { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 12px 0 14px; }
+.pick select { width: 100%; padding: 7px 9px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
+.pick label { font-size: 12px; color: var(--muted); }
+#cvbox { background: #2b2b2b; border-radius: 10px; display: flex; justify-content: center; overflow: hidden; }
+canvas { display: block; }
+.legend { display: flex; gap: 18px; flex-wrap: wrap; font-size: 13px; color: var(--muted); margin-top: 10px; }
+.legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+.ans { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 4px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px 4px 4px; border-radius: 20px; background: var(--yes-bg); font-size: 14px; }
+.chip b { background: var(--yes); color: #fff; border-radius: 12px; padding: 0 7px; font-size: 13px; }
+.chip.skip { background: var(--skip-bg); } .chip.skip b { background: var(--skip); }
+.chip.plain { background: var(--soft); } .chip.plain b { background: #6b7076; }
+.note { background: var(--soft); border-radius: 8px; padding: 9px 12px; margin: 8px 0; font-size: 14px; }
+.note.warn { background: var(--warn-bg); }
+table.why { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 8px; }
+table.why th { text-align: left; font-weight: 600; font-size: 12px; color: var(--muted); padding: 6px 6px; border-bottom: 1px solid var(--line); }
+table.why td { padding: 7px 6px; border-bottom: 1px solid var(--soft); vertical-align: top; }
+table.why tr.hov td { background: #fff7cc; }
+table.why .m { display: block; font-size: 11.5px; color: var(--muted); }
+.y { color: var(--yes); font-weight: 700; } .n { color: var(--no); } .u { color: var(--skip); font-weight: 700; }
+.in { color: var(--yes); font-weight: 650; } .sk { color: var(--skip); }
+pre { white-space: pre-wrap; background: var(--soft); border-radius: 8px; padding: 12px 14px; font: 13px/1.5 ui-monospace, monospace; margin: 8px 0; }
+.sec { margin-top: 22px; }
+.sec > h4 { margin: 0 0 4px; font-size: 15px; }
+.cap mark { background: #f6d8f6; color: inherit; border-radius: 3px; padding: 0 2px; }
+#empty { color: var(--muted); padding: 40px; text-align: center; }
+</style>
+</head>
+<body>
+<header>
+  <h1>ANCHOR ground truth</h1>
+  <button class="tab" data-tab="ov">Overview</button>
+  <button class="tab" data-tab="ru">Rules</button>
+  <button class="tab" data-tab="im">Images</button>
+  <span class="spacer"></span>
+  <span class="small muted" style="margin-right:8px">Data</span>
+  <span class="seg" id="splitSeg"></span>
+  <a class="small" href="/detailed" style="margin-left:18px">Detailed view</a>
+</header>
+
+<section class="page" id="ov"><div class="wrap" id="ovBody">Loading…</div></section>
+<section class="page" id="ru"><div class="wrap" id="ruBody">Loading…</div></section>
+<section class="page" id="im">
+  <aside id="side">
+    <div class="f">
+      <div><label class="l">Rule</label><select id="fRule"></select></div>
+      <label class="small"><input type="checkbox" id="fDraft"> Only images in the draft test set</label>
+      <div><label class="l">Image id contains</label><input type="text" id="fQ" placeholder="e.g. 534270"></div>
+      <details><summary class="small">More filters</summary>
+        <div style="display:grid;gap:8px;margin-top:6px">
+          <div><label class="l">Indoor / outdoor</label><select id="fIo"><option value="">Any</option><option value="indoor">Indoor</option><option value="outdoor">Outdoor</option><option value="unknown">Unclear</option></select></div>
+          <div><label class="l">People in the image</label><select id="fPeople"><option value="">Any</option><option value="1">Yes</option><option value="0">No</option></select></div>
+          <div><label class="l">Subject type</label><select id="fType"><option value="">Any</option></select></div>
+          <div><label class="l">Subject category</label><select id="fCat"><option value="">Any</option></select></div>
+        </div>
+      </details>
+    </div>
+    <div id="list"></div>
+    <div id="pager"><button id="prev">‹</button><span id="pinfo"></span><button id="next">›</button></div>
+  </aside>
+  <div id="main"><div id="empty">Pick an image on the left.</div><div id="mainBody" style="display:none">
+    <div><b id="ttl" style="font-size:17px"></b> <span id="scene" class="muted small" style="margin-left:8px"></span></div>
+    <div class="pick">
+      <div><label>Subject</label><select id="pSubj"></select></div>
+      <div><label>Rule</label><select id="pRule"></select></div>
+    </div>
+    <div id="cvbox"><canvas id="cv"></canvas></div>
+    <div class="legend">
+      <span><i style="background:var(--subj)"></i>subject</span>
+      <span><i style="background:#22c55e"></i>in the correct answer</span>
+      <span><i style="background:#c7c7c2"></i>not in the answer</span>
+      <span><i style="background:#f59e0b"></i>not scored (too close to call)</span>
+      <span class="muted">Hover an object or a table row to highlight it.</span>
+    </div>
+  </div></div>
+  <aside id="side2"></aside>
+</section>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = t => String(t ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const fmt = n => n == null ? '–' : Number(n).toLocaleString('en-US');
+const pct = (a, b) => b ? Math.round(100 * a / b) + '%' : '–';
+const jget = async u => { const r = await fetch(u); if (!r.ok) throw new Error(u + ' → ' + r.status); return r.json(); };
+
+// Plain-language names for the 16 rules and 7 properties.
+const SHORT = {
+  T01: 'bordering the subject', T02: 'larger than the subject', T03: 'left of the subject', T04: 'above the subject',
+  T05: 'same kind as the subject', T06: 'smaller and above', T07: 'left and reaching the image edge',
+  T08: 'left and not the same kind', T09: 'larger but not bordering', T10: 'at the image edge and not left',
+  T11: 'bordering and not larger', T12: 'bordering, except larger', T13: 'left, except the same kind',
+  T14: 'bordering, except above', T15: 'bordering and not the same kind, except at the image edge',
+  T16: 'same kind, plus anything bordering them',
+};
+const PROP = { touch: 'borders (in image)', larger: 'larger', smaller: 'smaller', left: 'left of', above: 'above', same_cat: 'same kind', border: 'reaches image edge' };
+const LEVEL = { L1: 'One property', L2: 'Two properties', L3: 'Three properties, or "plus anything bordering"' };
+
+const S = { sum: null, splits: [], split: null, tab: 'ov', openRule: null,
+  f: { tid: '', draft: false, q: '', io: '', people: '', type: '', cat: '' }, list: { items: [], total: 0, offset: 0, limit: 100 },
+  key: null, rec: null, draft: [], tokens: [], aid: null, tid: null, mode: 'contour', para: 0, hover: null, ids: null, w: 0, h: 0, img: null };
+const T = id => S.sum.templates.find(t => t.id === id);
+const subjText = s => esc(s).replace(/\{S\}/g, '<span class="s">the subject</span>');
+
+/* ---------- navigation */
+function showTab(t) {
+  S.tab = t;
+  document.querySelectorAll('.tab').forEach(b => b.classList.toggle('on', b.dataset.tab === t));
+  document.querySelectorAll('.page').forEach(p => p.classList.toggle('on', p.id === t));
+  setHash(); if (t === 'im') draw();
+}
+document.querySelectorAll('.tab').forEach(b => b.onclick = () => showTab(b.dataset.tab));
+function setHash() {
+  const p = new URLSearchParams({ tab: S.tab, split: S.split || '' });
+  if (S.tab === 'im' && S.key) { p.set('key', S.key); if (S.aid) p.set('a', S.aid); if (S.tid) p.set('r', S.tid); }
+  history.replaceState(null, '', '#' + p);
+}
+function renderSplitSeg() {
+  $('#splitSeg').innerHTML = S.splits.map(s => `<button data-s="${s}" class="${s === S.split ? 'on' : ''}">${s}</button>`).join('');
+  $('#splitSeg').querySelectorAll('button').forEach(b => b.onclick = async () => {
+    S.split = b.dataset.s; renderSplitSeg(); renderOverview(); renderRules(); await loadFilters(); S.list.offset = 0; await loadList(true);
+  });
+}
+
+/* ---------- overview */
+const IMG_STEPS = [['all', 'All images'], ['verify_ok', 'Caption and mask agree'], ['thing', 'Contain a separate object (not a crowd)'],
+  ['size', '… covering 2–60% of the image'], ['phrase_unique', '… with its own phrase in the caption'],
+  ['not_group', '… describing one object, not a group'], ['not_mismatch', '… naming the right kind of object'],
+  ['clutter', '… with 4–20 other objects around it']];
+const SUBJ_STEPS = [['thing', 'Separate objects in kept images'], ['size', 'Cover 2–60% of the image'],
+  ['phrase_unique', 'Have their own phrase in the caption'], ['not_group', 'Phrase describes one object'],
+  ['not_mismatch', 'Phrase names the right kind'], ['clutter', 'Have 4–20 other objects around them']];
+let ovMode = 'images';
+function steps(counts, defs) {
+  const top = counts[defs[0][0]] || 1;
+  return defs.map(([k, label], i) => {
+    const n = counts[k] || 0, prev = i ? counts[defs[i - 1][0]] || 0 : null, last = i === defs.length - 1;
+    return `<div class="step${last ? ' final' : ''}"><div>${label}<div class="bar"><i style="width:${100 * n / top}%"></i></div></div>
+      <div class="num" style="text-align:right">${fmt(n)}</div><div class="lost num">${prev != null && prev > n ? '−' + fmt(prev - n) : ''}</div></div>`;
+  }).join('');
+}
+function bars(title, obj, labels = {}) {
+  const e = Object.entries(obj || {}).sort((a, b) => b[1] - a[1]), tot = e.reduce((s, [, v]) => s + v, 0);
+  return `<div><div class="small" style="font-weight:600;margin-bottom:4px">${title}</div>` + e.map(([k, v]) =>
+    `<div class="drow"><span>${esc(labels[k] ?? k)}</span><div class="bar" style="margin:0"><i style="width:${100 * v / tot}%"></i></div><span class="num muted">${pct(v, tot)}</span></div>`).join('') + '</div>';
+}
+function renderOverview() {
+  const f = S.sum.funnel[S.split], d = S.sum.draft, sc = S.sum.scene[S.split] || {};
+  const I = f.images, A = f.anchors;
+  $('#ovBody').innerHTML = `
+    <h2>How many images survive the filters?</h2>
+    <p class="lead">Each image needs at least one clear <b>subject</b>: a single object, named by its own caption phrase, with 4–20 other objects around it. Showing the <b>${S.split}</b> split.</p>
+    <div class="tiles">
+      <div class="tile"><b>${fmt(I.clutter)}</b><span class="muted">images kept, of ${fmt(I.all)} (${pct(I.clutter, I.all)})</span></div>
+      <div class="tile"><b>${fmt(A.clutter)}</b><span class="muted">subjects in those images</span></div>
+      <div class="tile"><b>${fmt(d.n)}</b><span class="muted">draft test items, on ${fmt(d.anchors)} subjects (val + 10% of train)</span></div>
+    </div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <b>Filter steps</b><span class="seg" id="ovSeg"><button data-m="images" class="${ovMode === 'images' ? 'on' : ''}">Images</button><button data-m="subjects" class="${ovMode === 'subjects' ? 'on' : ''}">Subjects</button></span></div>
+      ${ovMode === 'images' ? steps(I, IMG_STEPS) : steps(A, SUBJ_STEPS)}
+      <p class="small muted" style="margin:10px 0 0">${ovMode === 'images' ? 'An image passes a step if at least one of its objects does.' : 'Counts objects in images whose caption and mask agree.'} The red number is how many were lost at that step.</p>
+    </div>
+    <details class="card"><summary>What is in the kept images?</summary>
+      <div class="dist" style="margin-top:12px">
+        ${bars('Indoor or outdoor (from the caption)', sc.io, { unknown: 'unclear' })}
+        ${bars('People in the image', sc.people_in_image, { True: 'yes', False: 'no' })}
+        ${bars('Food scene', sc.food, { True: 'yes', False: 'no' })}
+        ${bars('Subject type', sc.subject_type)}
+      </div></details>`;
+  $('#ovSeg').querySelectorAll('button').forEach(b => b.onclick = () => { ovMode = b.dataset.m; renderOverview(); });
+}
+
+/* ---------- rules */
+function mini(h) {
+  const bins = ['0', '1', '2', '3', '4', '5+'], mx = Math.max(1, ...bins.map(b => h[b] || 0));
+  return `<span class="mini">${bins.map(b => `<i style="height:${Math.max(2, 34 * (h[b] || 0) / mx)}px" title="${b}: ${fmt(h[b] || 0)}"></i>`).join('')}</span><br>
+    <span class="minil">${bins.map(b => `<span>${b}</span>`).join('')}</span>`;
+}
+function renderRules() {
+  const rs = S.sum.rule_stats[S.split], hs = S.sum.size_hist[S.split], ck = S.sum.template_checks || {}, dr = S.sum.draft.per_template;
+  let h = `<h2>The 16 rules</h2>
+    <p class="lead">Each rule selects other objects relative to the subject. The correct answer is computed from the object masks, never by hand. Click a rule for its exact wording. Numbers are for <b>${S.split}</b>.</p>`;
+  for (const lv of ['L1', 'L2', 'L3']) {
+    h += `<h3>${LEVEL[lv]} <span class="muted small" style="font-weight:400">(${lv})</span></h3><div class="card" style="padding:4px 16px">`;
+    for (const t of S.sum.templates.filter(t => t.level === lv)) {
+      const r = rs[t.id] || {}, open = S.openRule === t.id;
+      const tags = [t.twin ? `same answers as ${t.twin}` : '', t.calibration ? 'calibration' : ''].filter(Boolean).join(' · ');
+      h += `<div class="rule${open ? ' open' : ''}" data-t="${t.id}"><button>
+        <span class="rid">${t.id}</span>
+        <span>${esc(SHORT[t.id])}${tags ? `<span class="tagline">${tags}</span>` : ''}</span>
+        <span class="small muted num">${pct(r.empty || 0, r.kept)} empty</span>
+        <span class="small muted num">avg ${r.kept ? (r.sum_S / r.kept).toFixed(1) : '–'} objects</span>
+        <span class="chev">›</span></button>
+        <div class="body">${open ? ruleBody(t, r, hs[t.id] || {}, dr[t.id] || {}) : ''}</div></div>`;
+    }
+    h += '</div>';
+  }
+  const ok = (ck.fails || []).length === 0;
+  h += `<p class="small muted" style="margin-top:22px">${ok ? '✓ All three design checks pass' : '✗ Design checks failing: ' + esc(ck.fails.join('; '))}
+    (NOT and EXCEPT each cover ${(ck.not_families || []).length} property families; component matrix rank ${ck.q_rank}/${ck.q_cols}; ${(ck.twins || []).length} twin pairs).
+    The <a href="/detailed#tab=rules">detailed view</a> has every statistic.</p>`;
+  $('#ruBody').innerHTML = h;
+  document.querySelectorAll('.rule > button').forEach(b => b.onclick = () => {
+    const id = b.parentElement.dataset.t; S.openRule = S.openRule === id ? null : id; renderRules();
+  });
+  document.querySelectorAll('[data-ex]').forEach(b => b.onclick = async () => {
+    S.f.tid = b.dataset.ex; $('#fRule').value = S.f.tid; showTab('im'); S.list.offset = 0; await loadList(true);
+  });
+}
+function ruleBody(t, r, hist, d) {
+  const uses = t.prims.filter(p => p !== 'touches').map(p => PROP[p]).join(', ') + (t.closure ? ', borders (between objects)' : '');
+  let h = `<div class="small muted">Exact wording given to the model (three versions):</div>
+    ${t.text.map(x => `<div class="quote">${subjText(x)}</div>`).join('')}
+    <div style="display:flex;gap:40px;flex-wrap:wrap;margin-top:14px">
+      <div><div class="small muted">Answer size on ${fmt(r.kept)} subjects</div>${mini(hist)}</div>
+      <div class="small" style="max-width:520px">
+        <div><span class="muted">Uses:</span> ${esc(uses)}</div>`;
+  if (t.twin) h += `<div><span class="muted">Twin:</span> ${t.twin} gives exactly the same answers with different wording, so any difference between them is caused by the wording.</div>`;
+  if (t.calibration) h += `<div><span class="muted">Calibration:</span> easy by design, because the subject's phrase usually names its kind.</div>`;
+  if (t.has_opp) h += `<div><span class="muted">${t.closure ? 'The "plus anything bordering" part' : 'The NOT / EXCEPT part'}</span> changes the answer on ${pct(r.opp || 0, r.kept)} of subjects. The draft test set raises this to ${pct(d.opp || 0, d.all)}.</div>`;
+  h += `<div><span class="muted">Draft test set:</span> ${fmt(d.all || 0)} items</div>
+      <div style="margin-top:8px"><button data-ex="${t.id}" style="border:1px solid var(--line);background:#fff;border-radius:8px;padding:5px 12px;cursor:pointer">See examples →</button></div>
+    </div></div>`;
+  return h;
+}
+
+/* ---------- image list */
+function fillSel(sel, pairs, any = 'Any') {
+  const cur = sel.value;
+  sel.innerHTML = `<option value="">${any}</option>` + pairs.map(([v, n]) => `<option value="${esc(v)}">${esc(v)} (${fmt(n)})</option>`).join('');
+  if ([...sel.options].some(o => o.value === cur)) sel.value = cur;
+}
+async function loadFilters() {
+  const F = await jget('/api/filters?split=' + S.split);
+  fillSel($('#fType'), F.type); fillSel($('#fCat'), F.cat);
+  $('#fRule').innerHTML = '<option value="">Any rule</option>' + S.sum.templates.map(t => `<option value="${t.id}">${t.id} · ${esc(SHORT[t.id])}</option>`).join('');
+  $('#fRule').value = S.f.tid;
+}
+function readF() {
+  S.f = { tid: $('#fRule').value, draft: $('#fDraft').checked, q: $('#fQ').value.trim(), io: $('#fIo').value,
+          people: $('#fPeople').value, type: $('#fType').value, cat: $('#fCat').value };
+}
+async function loadList(openFirst) {
+  readF();
+  const p = new URLSearchParams({ split: S.split, stage: 'survived', offset: S.list.offset, limit: S.list.limit });
+  for (const [k, v] of Object.entries(S.f)) if (v) p.set(k === 'draft' ? 'draft' : k, k === 'draft' ? '1' : v);
+  const r = await jget('/api/list?' + p);
+  S.list.items = r.items; S.list.total = r.total;
+  $('#list').innerHTML = r.items.map(it => `<div class="it${it.key === S.key ? ' sel' : ''}" data-k="${it.key}">
+      <span>${it.key}</span><span class="muted small">${it.n_anchors} subject${it.n_anchors === 1 ? '' : 's'}${it.in_draft ? ' · test' : ''}</span></div>`).join('')
+    || '<div class="muted small" style="padding:14px">No images match.</div>';
+  $('#list').querySelectorAll('.it').forEach(e => e.onclick = () => openImage(e.dataset.k));
+  const o = S.list.offset;
+  $('#pinfo').textContent = r.total ? `${fmt(o + 1)}–${fmt(Math.min(o + S.list.limit, r.total))} of ${fmt(r.total)}` : '0 images';
+  $('#prev').disabled = o === 0; $('#next').disabled = o + S.list.limit >= r.total;
+  if (openFirst && r.items.length) openImage(r.items[0].key, null, S.f.tid || null);
+}
+['#fRule', '#fDraft', '#fIo', '#fPeople', '#fType', '#fCat'].forEach(s => $(s).onchange = () => { S.list.offset = 0; loadList(true); });
+let qt; $('#fQ').oninput = () => { clearTimeout(qt); qt = setTimeout(() => { S.list.offset = 0; loadList(true); }, 300); };
+$('#prev').onclick = () => { S.list.offset = Math.max(0, S.list.offset - S.list.limit); loadList(); };
+$('#next').onclick = () => { S.list.offset += S.list.limit; loadList(); };
+
+/* ---------- one image */
+async function openImage(key, aid, tid) {
+  S.key = key; S.hover = null;
+  document.querySelectorAll('#list .it').forEach(e => e.classList.toggle('sel', e.dataset.k === key));
+  const [d, mk] = await Promise.all([jget(`/api/image?split=${S.split}&key=${key}`),
+    fetch(`/mask/${S.split}/${key}`).then(async r => r.ok ? { buf: await r.arrayBuffer(), w: +r.headers.get('X-Width'), h: +r.headers.get('X-Height') } : null)]);
+  if (S.key !== key) return;
+  S.rec = d.rec; S.draft = d.draft || []; S.tokens = d.tokens || [];
+  S.ids = mk ? new Uint16Array(mk.buf) : null; S.w = mk ? mk.w : d.rec.W; S.h = mk ? mk.h : d.rec.H;
+  const an = S.rec.anchors.filter(a => Object.values(a.rules).some(r => r.keep));
+  S.aid = (an.find(a => a.id === aid) || an[0] || {}).id ?? null;
+  const a = cur();
+  S.tid = a ? (tid && a.rules[tid] ? tid : (S.tid && a.rules[S.tid]?.keep ? S.tid : (S.f.tid || Object.keys(a.rules).find(t => a.rules[t].keep)))) : null;
+  syncDraftChoice();
+  $('#empty').style.display = 'none'; $('#mainBody').style.display = '';
+  const sc = S.rec.scene || {};
+  $('#ttl').textContent = key;
+  $('#scene').textContent = [sc.io && sc.io !== 'unknown' ? sc.io : null, ...(sc.settings || []).slice(0, 2).map(s => s.replace(/_/g, ' ')),
+    S.rec.people_mask ? 'people' : null, sc.food ? 'food' : null].filter(Boolean).join(' · ');
+  $('#pSubj').innerHTML = an.map(a => `<option value="${a.id}">#${a.id} · ${esc(a.phrase)}</option>`).join('');
+  $('#pSubj').value = S.aid;
+  fillRuleSel();
+  S.img = null; draw(); renderSide(); setHash();
+  const img = new Image();
+  img.onload = () => { if (S.key === key) { S.img = img; draw(); } };
+  img.src = `/image/${S.split}/${key}`;
+}
+const cur = () => S.rec && S.rec.anchors.find(a => a.id === S.aid);
+function fillRuleSel() {
+  const a = cur(); if (!a) return;
+  $('#pRule').innerHTML = S.sum.templates.map(t => {
+    const r = a.rules[t.id];
+    const tail = !r ? '' : !r.keep ? ' — not scored here' : ` — ${r.S.length} object${r.S.length === 1 ? '' : 's'}`;
+    return `<option value="${t.id}">${t.id} · ${esc(SHORT[t.id])}${tail}</option>`;
+  }).join('');
+  $('#pRule').value = S.tid;
+}
+function syncDraftChoice() {
+  const it = S.draft.find(it => it.anchor === S.aid && it.tid === S.tid);
+  if (it) S.para = it.para;
+  const a = cur(); if (a && S.mode === 'text' && !a.text_ok) S.mode = 'contour';
+}
+$('#pSubj').onchange = () => { S.aid = +$('#pSubj').value; fillRuleSel(); syncDraftChoice(); draw(); renderSide(); setHash(); };
+$('#pRule').onchange = () => { S.tid = $('#pRule').value; syncDraftChoice(); draw(); renderSide(); setHash(); };
+
+/* the cell where the NOT / EXCEPT / closure clause decides */
+function oppIds(a, t, r) {
+  if (!t.has_opp || !r.cells) return [];
+  const cells = r.cells.split(' ');
+  return a.cands.filter((c, i) => {
+    const cl = cells[i] || '';
+    if (t.closure) return cl[1] === 'T';
+    if (t.id === 'T15') return cl === 'TFT';
+    return cl.length && /^T+$/.test(cl);
+  });
+}
+function chip(a, id, cls = '') { return `<span class="chip ${cls}" data-id="${id}"><b>${id}</b>${esc(a.cand_cats[id] || '')}</span>`; }
+function measure(p, q) {
+  if (p === 'touch') return q.gap == null ? 'far apart' : q.gap <= 1.5 ? 'outlines meet in image' : q.gap + ' px apart';
+  if (p === 'larger' || p === 'smaller') return q.ratio + '× the pixels';
+  if (p === 'left') return (q.dx > 0 ? q.dx + ' px left of edge' : -q.dx + ' px right of edge');
+  if (p === 'above') return (q.dy > 0 ? q.dy + ' px above top' : -q.dy + ' px below top');
+  if (p === 'border') return q.edge === 0 ? 'on the edge' : q.edge + ' px from edge';
+  if (p === 'same_cat') return '';
+  return '';
+}
+function renderSide() {
+  const a = cur(), box = $('#side2');
+  if (!a) { box.innerHTML = '<p class="muted">No scored subject in this image.</p>'; return; }
+  const t = T(S.tid), r = a.rules[S.tid];
+  const Sset = new Set(r.S), Uset = new Set(r.U), opp = oppIds(a, t, r), it = S.draft.find(x => x.anchor === a.id && x.tid === S.tid);
+  let h = `<div class="small muted">${S.tid} · ${t.level}</div><div style="font-size:18px;font-weight:650;margin-bottom:6px">Objects ${esc(SHORT[S.tid])}</div>`;
+  if (!r.keep) h += `<div class="note warn">This rule is not used for this subject: too many objects are too close to a threshold to call.</div>`;
+  h += `<div class="sec" style="margin-top:12px"><h4>Correct answer</h4>`;
+  h += r.S.length ? `<div class="ans">${r.S.map(i => chip(a, i)).join('')}</div>`
+    : `<div class="note">Nothing. The correct answer is an empty list <code>[]</code>.</div>`;
+  if (r.U.length) h += `<div class="small muted" style="margin-top:8px">Not scored, too close to call:</div><div class="ans">${r.U.map(i => chip(a, i, 'skip')).join('')}</div>`;
+  h += '</div>';
+  const notes = [];
+  if (opp.length) notes.push(t.closure
+    ? `Added only because they border a same-kind object: ${opp.map(i => `#${i}`).join(', ')}.`
+    : `The ${t.exc.length ? 'EXCEPT' : 'NOT'} part decides ${opp.map(i => `#${i} (${esc(a.cand_cats[i])})`).join(', ')}. A model that ignores it gets ${opp.length === 1 ? 'this object' : 'these objects'} wrong.`);
+  if (r.ch.length) notes.push(`Shortcut trap: ${r.ch.map(i => `#${i} (${esc(a.cand_cats[i])})`).join(', ')}. Guessing from bounding boxes or typical real-world size gives the wrong answer here.`);
+  if (it) notes.push(`In the draft test set (${it.role}), asked in text and outline mode.`);
+  if (t.twin) notes.push(`${t.twin} has exactly the same answer with different wording.`);
+  h += notes.map(n => `<div class="note">${n}</div>`).join('');
+
+  // why table
+  const showAll = S.showAll;
+  const used = t.prims.filter(p => p !== 'touches');
+  const cols = showAll ? ['same_cat', 'larger', 'smaller', 'touch', 'left', 'above', 'border'] : used;
+  h += `<div class="sec"><h4>Why each object is in or out</h4>
+    <label class="small muted"><input type="checkbox" id="showAll" ${showAll ? 'checked' : ''}> show all properties, not only the ones this rule uses</label>
+    <table class="why"><tr><th>Object</th>${cols.map(c => `<th>${PROP[c]}?</th>`).join('')}${t.closure ? '<th>borders a same-kind?</th>' : ''}<th>Answer</th></tr>`;
+  const cells = (r.cells || '').split(' ');
+  a.cands.forEach((c, i) => {
+    const q = a.preds[c];
+    h += `<tr data-id="${c}"><td><b>#${c}</b> ${esc(a.cand_cats[c])}</td>` + cols.map(p => {
+      const v = q[p], s = v === true ? '<span class="y">yes</span>' : v === false ? '<span class="n">no</span>' : '<span class="u">close</span>';
+      return `<td>${s}<span class="m">${esc(measure(p, q))}</span></td>`;
+    }).join('') + (t.closure ? `<td>${(cells[i] || '')[1] === 'T' ? '<span class="y">yes</span>' : '<span class="n">–</span>'}</td>` : '') +
+      `<td>${Sset.has(c) ? '<span class="in">✓ in</span>' : Uset.has(c) ? '<span class="sk">not scored</span>' : '<span class="n">out</span>'}</td></tr>`;
+  });
+  h += '</table></div>';
+
+  // prompt
+  h += `<details class="sec" id="promptBox"${S.promptOpen ? ' open' : ''}><summary>What the model is asked</summary>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:8px 0">
+      <span class="seg" id="modeSeg">${[['text', 'Phrase'], ['contour', 'Outline'], ['mark', 'Number']].map(([m, l]) =>
+        `<button data-m="${m}" class="${S.mode === m ? 'on' : ''}" ${m === 'text' && !a.text_ok ? 'disabled title="this subject has no usable phrase"' : ''}>${l}</button>`).join('')}</span>
+      <span class="seg" id="paraSeg">${[0, 1, 2].map(p => `<button data-p="${p}" class="${S.para === p ? 'on' : ''}">wording ${p + 1}</button>`).join('')}</span>
+    </div>
+    <div class="small muted">The subject is pointed at by its caption phrase, a magenta outline, or a number.</div>
+    <pre id="pDirect">…</pre>
+    <details><summary class="small">Probe question (asks every property for every object, once per subject)</summary><pre id="pProbe">…</pre></details>
+  </details>`;
+  h += `<details class="sec"><summary>Caption</summary><div class="cap small" style="margin-top:6px">${captionHtml(a)}</div></details>`;
+  box.innerHTML = h;
+
+  $('#showAll').onchange = e => { S.showAll = e.target.checked; renderSide(); };
+  $('#promptBox').ontoggle = e => { S.promptOpen = e.target.open; if (S.promptOpen) fetchPrompt(); };
+  $('#modeSeg').querySelectorAll('button').forEach(b => b.onclick = () => { if (!b.disabled) { S.mode = b.dataset.m; renderSide(); } });
+  $('#paraSeg').querySelectorAll('button').forEach(b => b.onclick = () => { S.para = +b.dataset.p; renderSide(); });
+  box.querySelectorAll('tr[data-id], .chip[data-id]').forEach(e => {
+    e.onmouseenter = () => setHover(+e.dataset.id); e.onmouseleave = () => setHover(null);
+  });
+  if (S.promptOpen) fetchPrompt();
+}
+async function fetchPrompt() {
+  const a = cur(); if (!a) return;
+  const p = new URLSearchParams({ tid: S.tid, para: S.para, modality: S.mode, sid: a.id });
+  if (S.mode === 'text') p.set('phrase', a.phrase);
+  const r = await jget('/api/render?' + p);
+  if ($('#pDirect')) { $('#pDirect').textContent = r.direct; $('#pProbe').textContent = r.probe_all; }
+}
+function captionHtml(a) {
+  return S.tokens.map(t => t.type === 'tag'
+    ? (t.ids.length === 1 && t.ids[0] === a.id ? `<mark>${esc(t.text)}</mark>` : esc(t.text))
+    : esc(t.text)).join('');
+}
+function setHover(id) {
+  if (S.hover === id) return;
+  S.hover = id;
+  document.querySelectorAll('#side2 tr[data-id]').forEach(e => e.classList.toggle('hov', +e.dataset.id === id));
+  drawSoon();
+}
+
+/* ---------- canvas */
+let queued = false;
+function drawSoon() { if (!queued) { queued = true; requestAnimationFrame(() => { queued = false; draw(); }); } }
+function scale() {
+  const box = $('#main'); const aw = box.clientWidth - 44, ah = Math.max(300, window.innerHeight - 260);
+  return Math.min(aw / S.w, ah / S.h, 2.5);
+}
+window.addEventListener('resize', () => drawSoon());
+function draw() {
+  const cv = $('#cv'), a = cur(), W = S.w, H = S.h;
+  if (!W || S.tab !== 'im') return;
+  const sc = scale(); S.sc = sc;
+  cv.width = W; cv.height = H; cv.style.width = Math.round(W * sc) + 'px'; cv.style.height = Math.round(H * sc) + 'px';
+  const ctx = cv.getContext('2d', { willReadFrequently: true });
+  if (S.img) ctx.drawImage(S.img, 0, 0, W, H); else { ctx.fillStyle = '#555'; ctx.fillRect(0, 0, W, H); }
+  if (!S.ids || !a) return;
+  const r = a.rules[S.tid], Sset = new Set(r ? r.S : []), Uset = new Set(r ? r.U : []);
+  const role = new Uint8Array(65536);           // 1 subject, 2 answer, 3 not scored, 4 not in answer
+  for (const c of a.cands) role[c] = Sset.has(c) ? 2 : Uset.has(c) ? 3 : 4;
+  role[a.id] = 1;
+  const C = { 1: [192, 38, 211], 2: [34, 197, 94], 3: [245, 158, 11], 4: [235, 235, 230] };
+  const im = ctx.getImageData(0, 0, W, H), d = im.data, ids = S.ids, hov = S.hover;
+  const edges = [];
+  // dim everything that is not part of the question, tint answers, find outlines
+  for (let p = 0; p < ids.length; p++) {
+    const id = ids[p], k = role[id], o = p * 4;
+    if (!k) { d[o] *= .55; d[o + 1] *= .55; d[o + 2] *= .55; continue; }
+    if (k === 2 || (hov && id === hov)) { const c = hov && id === hov ? [255, 230, 0] : C[2], al = hov && id === hov ? .35 : .3;
+      d[o] = d[o] * (1 - al) + c[0] * al; d[o + 1] = d[o + 1] * (1 - al) + c[1] * al; d[o + 2] = d[o + 2] * (1 - al) + c[2] * al; }
+    const x = p % W;
+    if ((x + 1 < W && ids[p + 1] !== id) || (x > 0 && ids[p - 1] !== id) || (p + W < ids.length && ids[p + W] !== id) || (p >= W && ids[p - W] !== id)) edges.push(p);
+  }
+  const rad = Math.max(1, Math.round(1.2 / sc));
+  for (const p of edges) {
+    const id = ids[p], k = role[id], c = C[k], rr = k === 1 ? rad + 1 : rad - 1, x = p % W, y = (p / W) | 0;
+    for (let yy = Math.max(0, y - rr); yy <= Math.min(H - 1, y + rr); yy++) for (let xx = Math.max(0, x - rr); xx <= Math.min(W - 1, x + rr); xx++) {
+      const o = (yy * W + xx) * 4; d[o] = c[0]; d[o + 1] = c[1]; d[o + 2] = c[2];
+    }
+  }
+  ctx.putImageData(im, 0, 0);
+  const fs = Math.max(10, Math.min(30, 14 / sc));
+  ctx.font = `700 ${fs}px system-ui, sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  for (const id of a.cands) {
+    const m = (S.rec.marks || {})[id]; if (!m) continue;
+    const k = role[id], txt = String(id), tw = ctx.measureText(txt).width + fs * .8, th = fs * 1.3;
+    ctx.fillStyle = k === 2 ? '#15803d' : k === 3 ? '#b45309' : 'rgba(40,40,40,.85)';
+    ctx.strokeStyle = id === hov ? '#ffe600' : '#fff'; ctx.lineWidth = (id === hov ? 3 : 1.5) / sc;
+    ctx.beginPath(); ctx.roundRect(m[0] - tw / 2, m[1] - th / 2, tw, th, th / 2); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#fff'; ctx.fillText(txt, m[0], m[1] + 1 / sc);
+  }
+}
+$('#cv').onmousemove = e => {
+  if (!S.ids) return;
+  const b = e.target.getBoundingClientRect(), x = Math.floor((e.clientX - b.left) / S.sc), y = Math.floor((e.clientY - b.top) / S.sc);
+  const id = S.ids[y * S.w + x], a = cur();
+  setHover(a && a.cands.includes(id) ? id : null);
+};
+$('#cv').onmouseleave = () => setHover(null);
+document.addEventListener('keydown', e => {
+  if (S.tab !== 'im' || /INPUT|SELECT/.test(document.activeElement.tagName)) return;
+  const i = S.list.items.findIndex(x => x.key === S.key);
+  if (e.key === 'ArrowDown' || e.key === 'ArrowRight') { const n = S.list.items[i + 1]; if (n) openImage(n.key); }
+  if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') { const n = S.list.items[i - 1]; if (n) openImage(n.key); }
+});
+
+/* ---------- start */
+async function init() {
+  const j = await jget('/api/summary');
+  S.sum = j.summary; S.splits = j.splits;
+  const p = new URLSearchParams(location.hash.slice(1));
+  S.split = S.splits.includes(p.get('split')) ? p.get('split') : (S.splits.includes('val') ? 'val' : S.splits[0]);
+  renderSplitSeg(); renderOverview(); renderRules();
+  await loadFilters();
+  if (p.get('r')) { S.f.tid = ''; }
+  showTab(['ov', 'ru', 'im'].includes(p.get('tab')) ? p.get('tab') : 'ov');
+  await loadList(!p.get('key'));
+  if (p.get('key')) await openImage(p.get('key'), p.get('a') ? +p.get('a') : null, p.get('r'));
+}
+init().catch(e => document.body.insertAdjacentHTML('beforeend', `<pre style="color:#b42318;margin:20px">${esc(e.stack || e)}</pre>`));
+</script>
+</body>
+</html>
